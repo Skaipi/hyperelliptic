@@ -1,4 +1,5 @@
-from src.polynomial import GF_Polynomial, Polynomial
+from src.polynomial import Polynomial
+from src.gf_polynomial import GF_Polynomial
 from src.hyperelliptic import HC
 from src.integer import ZP
 from src.utils import isPrime
@@ -11,6 +12,10 @@ class GaloisField:
         # Check i polynomial is set and if it's irreducible
         if m < 1:
             raise ValueError(f"Invalid exponent parameter for GF: {m}")
+        if m > 1 and polynomial_coeff == None:
+            raise ValueError(
+                "Field with q != p must have defined irreducible polynomial"
+            )
         if not isPrime(p):
             raise ValueError(f"{p} is not prime")
 
@@ -58,6 +63,15 @@ class GaloisField:
     def int(self, value):
         return ZP(self, value)
 
+    def element(self, value):
+        if self.m > 1:
+            if not isinstance(value, list):
+                raise ValueError(
+                    "Element of field is not defined as array of coefficients"
+                )
+            return GF_Polynomial(self, self._parse_coeff(value))
+        return ZP(self, value)
+
     def rand_int(self):
         return self.int(randint(0, self.p - 1))
 
@@ -66,9 +80,7 @@ class GaloisField:
 
     def poly(self, coeff, symbol="x"):
         parsed_coeff = self._parse_coeff(coeff)
-        if self.m == 1:
-            return Polynomial(parsed_coeff, self, symbol)
-        return GF_Polynomial(self, parsed_coeff, symbol)
+        return Polynomial(parsed_coeff, self, symbol)
 
     def hyperelliptic(self, h, f):
         return HC(self, h, f)
