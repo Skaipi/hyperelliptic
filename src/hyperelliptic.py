@@ -1,4 +1,3 @@
-from src.utils import xgcd
 from random import randint
 
 INF_POINT = ("Inf", "Inf")
@@ -159,8 +158,8 @@ class Divisor:
 
     def __add__(self, other):
         u1, u2, v1, v2 = self.u, other.u, self.v, other.v
-        d1, e1, e2 = xgcd(u1, u2)
-        d, c1, c2 = xgcd(d1, v1 + v2 + self.c.h)
+        d1, e1, e2 = u1.xgcd(u2)
+        d, c1, c2 = d1.xgcd(v1 + v2 + self.c.h)
         s1 = c1 * e1
         s2 = c1 * e2
         s3 = c2
