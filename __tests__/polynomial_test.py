@@ -1,6 +1,5 @@
 import pytest
 from src.gf import GaloisField
-from src.utils import gcd
 
 
 def test_constructors():
@@ -135,8 +134,8 @@ def test_gcd():
     p3 = gf.poly([1, 4, 1, 4])
     p4 = gf.poly([1, 0, 1])
 
-    assert gcd(p1, p2) == gf.poly([1, 1])
-    assert gcd(p3, p4) == p4
+    assert p1.gcd(p2) == gf.poly([1, 1])
+    assert p3.gcd(p4) == p4
 
 
 def test_factorization():

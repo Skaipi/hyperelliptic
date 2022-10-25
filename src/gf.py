@@ -32,13 +32,13 @@ class GaloisField:
     def zero(self):
         if self.m == 1:
             return self.int_zero
-        return self.poly_zero
+        return GF_Polynomial(self, [self.int_zero])
 
     @property
     def one(self):
         if self.m == 1:
             return self.int_one
-        return self.poly_one
+        return GF_Polynomial(self, [self.int_one])
 
     @property
     def int_zero(self):
@@ -50,15 +50,11 @@ class GaloisField:
 
     @property
     def poly_zero(self):
-        if self.m == 1:
-            return Polynomial([self.int_zero], self)
-        return GF_Polynomial(self, [self.int_zero])
+        return Polynomial([self.zero], self)
 
     @property
     def poly_one(self):
-        if self.m == 1:
-            return Polynomial([self.int_one], self)
-        return GF_Polynomial(self, [self.int_one])
+        return Polynomial([self.one], self)
 
     def int(self, value):
         return ZP(self, value)

@@ -1,5 +1,4 @@
 from src.integer import ZP
-from src.utils import gcd
 from copy import copy
 
 
@@ -30,6 +29,12 @@ class Polynomial:
     def one(self):
         return self._from_coeff([self.coeff_one()])
 
+    def to_monic(self):
+        c = self.coeff[0]
+        if c > 1:
+            return self / c
+        return self
+
     def coeff_zero(self):
         if self.gf != None:
             return self.gf.int_zero
@@ -55,6 +60,26 @@ class Polynomial:
         coeff = [c * (l - i) for i, c in enumerate(self.coeff[:-1])]
         return self._from_coeff(coeff)
 
+    def gcd(self, other):
+        r1, r0 = self, other
+        while r0 != self.zero():
+            r1, r0 = r0, r1 % r0
+
+        return r1.to_monic()
+
+    def xgcd(self, other):
+        r1, r0 = self, other
+        s1, s0 = self.one(), self.zero()
+        t1, t0 = self.zero(), self.one()
+
+        while r0 != self.zero():
+            q = r1 // r0
+            r1, r0 = r0, r1 - q * r0
+            s1, s0 = s0, s1 - q * s0
+            t1, t0 = t0, t1 - q * t0
+
+        return r1, s1, t1
+
     # https://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
     def factor(self):
         if self.gf == None:
@@ -78,13 +103,13 @@ class Polynomial:
         gf = self.gf
         factors = []
 
-        c = gcd(self, self.derivative())
+        c = self.gcd(self.derivative())
         w = self // c
 
         # Step one
         i = 1
         while w != self.one():
-            y = gcd(w, c)
+            y = w.gcd(c)
             fac = w // y
             if fac != self.one() and i % gf.p != 0:
                 [factors.append(fac) for _ in range(i)]
@@ -108,7 +133,7 @@ class Polynomial:
         i = 1
         while i <= self.deg // 2:
             h = pow(x, gf.q, poly)
-            g = gcd(poly, h - x)
+            g = poly.gcd(h - x)
             if g != self.one():
                 factors.append((g, i))
                 poly = poly // g
@@ -125,14 +150,14 @@ class Polynomial:
 
         while len(factors) < self.deg // deg:
             rand = gf.rand_poly(deg)
-            g = gcd(self, rand)
+            g = self.gcd(rand)
             if g == self.one():
                 g = pow(rand, (gf.q**deg - 1) // 2, self) - self.one()
             i = 0
             for fac in factors:
                 if fac.deg <= deg:
                     continue
-                d = gcd(g, fac)
+                d = g.gcd(fac)
                 if d not in [self.one(), fac]:
                     factors.remove(fac)
                     factors.append(d)

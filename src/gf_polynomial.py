@@ -1,6 +1,5 @@
 from src.polynomial import Polynomial
 from src.integer import ZP
-from src.utils import xgcd
 
 
 class GF_Polynomial:
@@ -21,6 +20,12 @@ class GF_Polynomial:
         coeff = [self.coeff[0].one()]
         return GF_Polynomial(self.gf, coeff, self.symbol)
 
+    def xgcd(self, other):
+        return self._poly.xgcd(other._poly)
+
+    def to_monic(self):
+        return self._poly.to_monic()
+
     @property
     def deg(self) -> int:
         return len(self.coeff) - 1
@@ -29,12 +34,10 @@ class GF_Polynomial:
         if self == self.zero():
             raise ZeroDivisionError("Element 0 has no inverse")
 
-        d, a, b = xgcd(self._poly, self.gf._poly)
+        d, a, b = self.xgcd(self.gf)
         if not d.isConst():
             raise Exception("Element has no inverse!")
-        d_inv = d.toInt().inverse()
-        result = a * d_inv % self.gf._poly
-        return self._from_zp_polynomial(result)
+        return self._from_zp_polynomial(a.to_monic())
 
     def __add__(self, other):
         if isinstance(other, ZP) or isinstance(other, int):
