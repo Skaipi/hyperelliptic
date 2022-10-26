@@ -1,5 +1,7 @@
 import math
 
+from src.utils import gf_operation
+
 
 class ZP:
     def __init__(self, gf, value):
@@ -7,18 +9,17 @@ class ZP:
         self.p = gf.p
         self.value = value % self.p
 
-    def _from_value(self, value):
-        return ZP(self.gf, value)
-
     def zero(self):
         return self._from_value(0)
 
     def one(self):
         return self._from_value(1)
 
+    @gf_operation
     def gcd(self, other):
         return math.gcd(self.value, other.value)
 
+    @gf_operation
     def xgcd(self, other):
         r0 = other.value if isinstance(other, ZP) else other
         r1 = self.value
@@ -42,6 +43,10 @@ class ZP:
             raise Exception(f"Element {self.value} is not inversable mod {self.p}")
         return s
 
+    def _from_value(self, value):
+        return ZP(self.gf, value)
+
+    @gf_operation
     def __add__(self, other):
         if isinstance(other, int):
             return self + self._from_value(other)
@@ -49,9 +54,11 @@ class ZP:
             return other + self
         return self._from_value(self.value + other.value)
 
+    @gf_operation
     def __radd__(self, other):
         return self.__add__(other)
 
+    @gf_operation
     def __sub__(self, other):
         if isinstance(other, int):
             return self - self._from_value(other)
@@ -59,9 +66,11 @@ class ZP:
             return other - self
         return self._from_value(self.value - other.value)
 
+    @gf_operation
     def __rsub__(self, other):
         return self.__sub__(other)
 
+    @gf_operation
     def __mul__(self, other):
         if isinstance(other, int):
             return self * self._from_value(other)
@@ -69,9 +78,11 @@ class ZP:
             return other * self
         return self._from_value(self.value * other.value)
 
+    @gf_operation
     def __rmul__(self, other):
         return self.__mul__(other)
 
+    @gf_operation
     def __div__(self, other):
         if isinstance(other, int):
             return self._from_value(
@@ -79,9 +90,11 @@ class ZP:
             )
         return self._from_value(self.value * other.inverse().value)
 
+    @gf_operation
     def __truediv__(self, other):
         return self.__div__(other)
 
+    @gf_operation
     def __divmod__(self, other):
         if isinstance(other, int):
             q, r = divmod(self.value, other)
@@ -89,9 +102,11 @@ class ZP:
         q, r = divmod(self.value, other.value)
         return self._from_value(q), self._from_value(r)
 
+    @gf_operation
     def __mod__(self, other):
         return divmod(self, other)[1]
 
+    @gf_operation
     def __floordiv__(self, other):
         return divmod(self, other)[0]
 
@@ -103,24 +118,22 @@ class ZP:
     def __neg__(self):
         return self._from_value(-self.value)
 
+    @gf_operation
     def __gt__(self, other):
         if isinstance(other, int):
             return self.value > (other % self.p)
-        elif isinstance(other, ZP):
-            return self.value > other.value
-        raise Exception("")
+        return self.value > other.value
 
+    @gf_operation
     def __lt__(self, other):
         if isinstance(other, int):
             return self.value < (other % self.p)
-        elif isinstance(other, ZP):
-            return self.value < other.value
-        raise Exception("")
+        return self.value < other.value
 
     def __eq__(self, other):
         if isinstance(other, int):
             return self.value == (other % self.p)
-        elif isinstance(other, ZP):
+        if isinstance(other, ZP):
             return self.value == other.value
         return False
 

@@ -168,5 +168,10 @@ class GaloisField:
             return self.poly(arg)
         return
 
+    def __eq__(self, other):
+        if not isinstance(other, GaloisField):
+            return False
+        return self.q == other.q and self._poly == other._poly
+
     def _parse_coeff(self, coeff):
         return list(map(lambda x: ZP(self, x) if isinstance(x, int) else x, coeff))
