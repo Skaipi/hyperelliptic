@@ -2,22 +2,33 @@ from src.integer import ZP
 from copy import copy
 
 
+def is_int_like(obj):
+    return isinstance(obj, int) or isinstance(obj, ZP)
+
+
+def same_type_coeff(function):
+    def wrapper(poly_a, poly_b):
+        if is_int_like(poly_a) or is_int_like(poly_b):
+            return function(poly_a, poly_b)
+
+        ca, cb = poly_a.coeff[0], poly_b.coeff[0]
+        is_int_type = is_int_like(ca) or is_int_like(cb)
+        if not is_int_type and type(ca) != type(cb):
+            print(type(ca))
+            print(type(cb))
+            raise ValueError(
+                f"Types of polynomial {poly_a} and {poly_b} must not differ"
+            )
+        return function(poly_a, poly_b)
+
+    return wrapper
+
+
 class Polynomial:
     def __init__(self, coeff, field=None, symbol="x") -> None:
-        self.coeff = self.strip(coeff)
+        self.coeff = self._strip(coeff)
         self.symbol = symbol
         self.gf = field
-
-    def strip(self, arr):
-        index = -1
-        for i in range(len(arr)):
-            if arr[i] != 0:
-                index = i
-                break
-        return arr[index:]
-
-    def _from_coeff(self, coeff):
-        return Polynomial(coeff, self.gf, self.symbol)
 
     @property
     def deg(self) -> int:
@@ -60,6 +71,7 @@ class Polynomial:
         coeff = [c * (l - i) for i, c in enumerate(self.coeff[:-1])]
         return self._from_coeff(coeff)
 
+    @same_type_coeff
     def gcd(self, other):
         r1, r0 = self, other
         while r0 != self.zero():
@@ -67,6 +79,7 @@ class Polynomial:
 
         return r1.to_monic()
 
+    @same_type_coeff
     def xgcd(self, other):
         r1, r0 = self, other
         s1, s0 = self.one(), self.zero()
@@ -166,6 +179,18 @@ class Polynomial:
 
         return factors
 
+    def _from_coeff(self, coeff):
+        return Polynomial(coeff, self.gf, self.symbol)
+
+    def _strip(self, arr):
+        index = -1
+        for i in range(len(arr)):
+            if arr[i] != 0:
+                index = i
+                break
+        return arr[index:]
+
+    @same_type_coeff
     def __add__(self, other):
         if isinstance(other, ZP) or isinstance(other, int):
             coeff = copy(self.coeff)  # Preventing mutation on self.coeff
@@ -183,11 +208,13 @@ class Polynomial:
             result.append(coeff)
         return self._from_coeff(result)
 
+    @same_type_coeff
     def __sub__(self, other):
         return self + (-other)
 
+    @same_type_coeff
     def __mul__(self, other):
-        if isinstance(other, int) or isinstance(other, ZP):
+        if is_int_like(other):
             return self._from_coeff(list(map(lambda x: x * other, self.coeff)))
 
         result = [self.coeff_zero()] * (self.deg + other.deg + 1)
@@ -196,6 +223,7 @@ class Polynomial:
                 result[e1 + e2] += c1 * c2
         return self._from_coeff(result)
 
+    @same_type_coeff
     def __rmul__(self, other):
         return self.__mul__(other)
 
@@ -214,11 +242,12 @@ class Polynomial:
     def __div__(self, other):
         if isinstance(other, self.coeff[0].__class__):
             return self._from_coeff(list(map(lambda x: x / other, self.coeff)))
-        raise NotImplementedError("")
+        raise ValueError("Cannot divide polynomial by other type than int")
 
     def __truediv__(self, other):
         return self.__div__(other)
 
+    @same_type_coeff
     def __divmod__(self, other):
         if self.deg < other.deg:
             return self.zero(), self
@@ -237,9 +266,11 @@ class Polynomial:
 
         return quotient, remainder
 
+    @same_type_coeff
     def __mod__(self, other):
         return divmod(self, other)[1]
 
+    @same_type_coeff
     def __floordiv__(self, other):
         return divmod(self, other)[0]
 
@@ -247,11 +278,14 @@ class Polynomial:
         return self._from_coeff(list(map(lambda x: -x, self.coeff)))
 
     def __eq__(self, other):
+        print("dupa_zp")
         if isinstance(other, int):
             return len(self.coeff) == 1 and self.coeff[0] == other
-        if self.deg != other.deg:
-            return False
-        return all(a == b for a, b in zip(self.coeff, other.coeff))
+        if isinstance(other, Polynomial):
+            if self.deg != other.deg:
+                return False
+            return all(a == b for a, b in zip(self.coeff, other.coeff))
+        return False
 
     def __repr__(self) -> str:
         return str(self)

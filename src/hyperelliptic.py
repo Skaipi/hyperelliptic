@@ -1,4 +1,6 @@
+from src.utils import gf_operation
 from random import randint
+
 
 INF_POINT = ("Inf", "Inf")
 
@@ -125,6 +127,10 @@ class Divisor:
 
         return Divisor(curve, u, v)
 
+    @classmethod
+    def zero(cls, curve):
+        return Divisor(curve, curve.gf.poly_one, curve.gf.poly_zero)
+
     @property
     def points(self):
         if hasattr(self, "_points"):
@@ -152,10 +158,7 @@ class Divisor:
 
         return Divisor(self.c, u, v)
 
-    @classmethod
-    def zero(cls, curve):
-        return Divisor(curve, curve.gf.poly_one, curve.gf.poly_zero)
-
+    @gf_operation
     def __add__(self, other):
         u1, u2, v1, v2 = self.u, other.u, self.v, other.v
         d1, e1, e2 = u1.xgcd(u2)
@@ -170,7 +173,7 @@ class Divisor:
 
     def __mul__(self, other):
         if not isinstance(other, int):
-            raise NotImplementedError(f"Divisor cannot be multiplied by {other}")
+            raise ValueError(f"Divisor cannot be multiplied by {other}")
 
         tmp = self
         result = Divisor.zero(self.c)
@@ -186,8 +189,10 @@ class Divisor:
         b = -self.v - self.c.h
         return Divisor(self.c, self.u, b)
 
-    def __eq__(self, other: "Divisor"):
-        return self.u == other.u and self.v == other.v
+    def __eq__(self, other):
+        if isinstance(other, Divisor):
+            return self.u == other.u and self.v == other.v
+        return False
 
     def __str__(self):
         return f"D: {str(self.u)} | {str(self.v)}"

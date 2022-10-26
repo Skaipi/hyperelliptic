@@ -1,4 +1,5 @@
 from src.polynomial import Polynomial
+from src.utils import gf_operation
 from src.integer import ZP
 
 
@@ -9,8 +10,9 @@ class GF_Polynomial:
         self.symbol = symbol
         self.gf = gf
 
-    def _from_zp_polynomial(self, poly):
-        return GF_Polynomial(self.gf, poly.coeff, poly.symbol)
+    @property
+    def deg(self) -> int:
+        return len(self.coeff) - 1
 
     def zero(self):
         coeff = [self.coeff[0].zero()]
@@ -26,10 +28,6 @@ class GF_Polynomial:
     def to_monic(self):
         return self._poly.to_monic()
 
-    @property
-    def deg(self) -> int:
-        return len(self.coeff) - 1
-
     def inverse(self):
         if self == self.zero():
             raise ZeroDivisionError("Element 0 has no inverse")
@@ -39,38 +37,49 @@ class GF_Polynomial:
             raise Exception("Element has no inverse!")
         return self._from_zp_polynomial(a.to_monic())
 
+    def _from_zp_polynomial(self, poly):
+        return GF_Polynomial(self.gf, poly.coeff, poly.symbol)
+
+    @gf_operation
     def __add__(self, other):
         if isinstance(other, ZP) or isinstance(other, int):
             return self._from_zp_polynomial(self._poly + other)
         result = self._poly + other._poly
         return self._from_zp_polynomial(result)
 
+    @gf_operation
     def __sub__(self, other):
         if isinstance(other, ZP) or isinstance(other, int):
             return self._from_zp_polynomial(self._poly - other)
         result = self._poly - other._poly
         return self._from_zp_polynomial(result)
 
+    @gf_operation
     def __mul__(self, other):
         if isinstance(other, int) or isinstance(other, ZP):
-            return self._poly * other
+            return self._from_zp_polynomial(self._poly * other)
         result = self._poly * other._poly
         return self._from_zp_polynomial(result)
 
+    @gf_operation
     def __rmul__(self, other):
         return self.__mul__(other)
 
+    @gf_operation
     def __pow__(self, other):
         result = self._poly**other
         return self._from_zp_polynomial(result)
 
+    @gf_operation
     def __divmod__(self, other):
         r1, r2 = divmod(self._poly, other._poly)
         return self._from_zp_polynomial(r1), self._from_zp_polynomial(r2)
 
+    @gf_operation
     def __div__(self, other):
         return self._from_zp_polynomial(self._poly / other)
 
+    @gf_operation
     def __truediv__(self, other):
         return self._from_zp_polynomial(self._poly / other)
 
@@ -83,9 +92,11 @@ class GF_Polynomial:
             result += x**i * c
         return result
 
+    @gf_operation
     def __mod__(self, other):
         return divmod(self, other)[1]
 
+    @gf_operation
     def __floordiv__(self, other):
         return divmod(self, other)[0]
 
@@ -98,4 +109,6 @@ class GF_Polynomial:
     def __eq__(self, other):
         if isinstance(other, ZP) or isinstance(other, int):
             return self._poly == other
-        return self._poly == other._poly
+        if isinstance(other, GF_Polynomial):
+            return self._poly == other._poly
+        return False
