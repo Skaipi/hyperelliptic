@@ -150,16 +150,21 @@ class GaloisField:
 
         return t0
 
-    # NOTE: This may be generator function
     def get_elements(self, limit=0):
         if self.m == 1:
-            return [self.int(i) for i in range(self.p if limit == 0 else limit)]
+            for _ in range(self.p if limit == 0 else limit):
+                yield self.int(_)
+            return
 
         if limit <= 0:
             limit = self.q
 
-        a = self.poly([1, 0], self._poly.symbol)
-        return [a**i for i in range(min(limit, self.q))]
+        a = self.element([1, 0])
+        result = a**0
+
+        for _ in range(min(limit, self.q)):
+            yield result
+            result = result * a
 
     def __call__(self, arg):
         if isinstance(arg, int):
