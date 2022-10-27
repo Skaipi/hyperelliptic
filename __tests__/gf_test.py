@@ -27,3 +27,12 @@ def test_different_gf():
 
     assert a + c == GaloisField(11)(1)
     assert b + d == GaloisField(23)(12)
+
+
+def test_get_elements():
+    gf = GaloisField(7, 4, [1, 0, 5, 4, 3])
+
+    assert len([_ for _ in gf.get_elements()]) == gf.q
+
+    gf = GaloisField(11)
+    assert len([_ for _ in gf.get_elements()]) == gf.q

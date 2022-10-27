@@ -14,8 +14,6 @@ def same_type_coeff(function):
         ca, cb = poly_a.coeff[0], poly_b.coeff[0]
         is_int_type = is_int_like(ca) or is_int_like(cb)
         if not is_int_type and type(ca) != type(cb):
-            print(type(ca))
-            print(type(cb))
             raise ValueError(
                 f"Types of polynomial {poly_a} and {poly_b} must not differ"
             )
@@ -278,7 +276,6 @@ class Polynomial:
         return self._from_coeff(list(map(lambda x: -x, self.coeff)))
 
     def __eq__(self, other):
-        print("dupa_zp")
         if isinstance(other, int):
             return len(self.coeff) == 1 and self.coeff[0] == other
         if isinstance(other, Polynomial):
