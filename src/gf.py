@@ -88,27 +88,6 @@ class GaloisField:
             return a.sqrt()
         raise ValueError(f"{a} does not have sqrt method")
 
-    def mod_inv(self, a):
-        if a == 0:
-            return 0
-
-        p = self.p
-        t0, t1 = 0, 1
-        r0, r1 = p, a
-
-        while r1 != 0:
-            q = r0 // r1
-            t0, t1 = t1, t0 - q * t1
-            r0, r1 = r1, r0 - q * r1
-
-        if r0 > 1:
-            raise Exception(f"Element {a} is not inversable mod {p}")
-
-        if t0 < 0:
-            t0 += p
-
-        return t0
-
     def get_elements(self, limit=0):
         if self.m == 1:
             for _ in range(self.p if limit == 0 else limit):
