@@ -81,53 +81,12 @@ class GaloisField:
     def hyperelliptic(self, h, f):
         return HC(self, h, f)
 
-    # NOTE: Solution can be lifted vai hensell lemma from p to p^m
     def sqrt(self, a):
-        if not self.is_quadratic_residue(a):
-            raise ValueError(f"Argument {a} has no square root")
-
-        if a == 0:
-            return self.int(0)
-
-        a = a.value if isinstance(a, ZP) else a
-        p = self.p
-        q = p - 1
-        s = 0
-        while q & 1 == 0:
-            q //= 2
-            s += 1
-        if s == 1:
-            return pow(a, (p + 1) // 4, p)
-        for test in range(2, p):
-            if pow(test, (p - 1) // 2, p) == p - 1:
-                break
-
-        c = pow(test, q, p)
-        r = pow(a, (q + 1) // 2, p)
-        t = pow(a, q, p)
-        m = s
-        t2 = 0
-        while (t - 1) % p != 0:
-            t2 = t**2 % p
-            for i in range(1, m):
-                if (t2 - 1) % p == 0:
-                    break
-                t2 = t2**2 % p
-            b = pow(c, 1 << (m - i - 1), p)
-            r = (r * b) % p
-            c = (b * b) % p
-            t = (t * c) % p
-            m = i
-        return self.int(r)
-
-    def is_quadratic_residue(self, a):
-        if self.legendre(a) == 1 or a == 0:
-            return True
-        return False
-
-    def legendre(self, a):
-        p = self.p
-        return a ** ((p - 1) // 2)
+        if isinstance(a, int):
+            a = self.int(a)
+        if isinstance(a, ZP):
+            return a.sqrt()
+        raise ValueError(f"{a} does not have sqrt method")
 
     def mod_inv(self, a):
         if a == 0:

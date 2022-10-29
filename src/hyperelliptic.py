@@ -16,8 +16,6 @@ class HC:
             raise ValueError("Function f must be monic")
         if f.deg % 2 == 0:
             raise ValueError("Degree of function f must be an odd number")
-        if gf.m > 1 and (f.deg >= gf.m or h.deg >= gf.m):
-            raise ValueError("Functions f and h must be defined over GF")
         if h.deg > self.g:
             raise ValueError("Invalid function h for Curve of given genus")
         if gf.p != 2 and h != h.zero():
@@ -72,7 +70,7 @@ class HC:
         hx = self.h(x)
         fx = self.f(x)
         discriminant = hx * hx + 4 * fx
-        if not self.gf.is_quadratic_residue(discriminant):
+        if not discriminant.is_quadratic_residue():
             return None
         y1 = (-hx + self.gf.sqrt(discriminant)) / self.gf(2)
         y2 = -y1 - hx
