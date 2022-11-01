@@ -34,6 +34,59 @@ class ZP:
 
         return self._from_value(r1), self._from_value(s1), self._from_value(t1)
 
+    def sqrt(self):
+        # Tonelli-Shanks algorithm
+        if not self.is_quadratic_residue():
+            raise ValueError(f"Argument {self} has no square root")
+
+        if self == self.zero():
+            return self.zero()
+
+        p = self.p
+        q = p - 1
+        s = 0  # S must be an integer, not ZP
+
+        # find Q and S such that p - 1 = Q * 2^S
+        while q % 2 == 0:
+            q //= 2
+            s += 1
+
+        if s == 1:
+            return pow(self, (p + 1) // 4)
+
+        # Find z that is not quadratic residue
+        z = self.one()
+        while z.is_quadratic_residue():
+            z += 1
+
+        c = pow(z, q)
+        t = pow(self, q)
+        r = pow(self, (q + 1) // 2)
+        m = s
+
+        while True:
+            if t % p == 1:
+                return r
+
+            # Find the least i such that t^2^i = 1
+            i = 1
+            while pow(t, pow(2, i)) != 1:
+                i += 1
+
+            b = pow(c, pow(2, m - i - 1))
+            m = i
+            c = pow(b, 2)
+            t = t * c
+            r = r * b
+
+    def is_quadratic_residue(self):
+        if self.legendre() == self.one() or self == self.zero():
+            return True
+        return False
+
+    def legendre(self):
+        return pow(self, ((self.p - 1) // 2))
+
     def inverse(self):
         if self == 0:
             raise ZeroDivisionError(f"Element 0 is not inversable")
@@ -110,10 +163,12 @@ class ZP:
     def __floordiv__(self, other):
         return divmod(self, other)[0]
 
-    def __pow__(self, other):
+    def __pow__(self, other, mod=None):
         if isinstance(other, int):
+            if mod != None:
+                return self._from_value(pow(self.value, other, mod))
             return self._from_value(pow(self.value, other, self.p))
-        raise NotImplementedError("")
+        raise ValueError("Exponent must be an integer")
 
     def __neg__(self):
         return self._from_value(-self.value)

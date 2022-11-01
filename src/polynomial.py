@@ -27,6 +27,7 @@ class Polynomial:
         self.coeff = self._strip(coeff)
         self.symbol = symbol
         self.gf = field
+        self._has_int_coeff = is_int_like(self.coeff[0])
 
     @property
     def deg(self) -> int:
@@ -294,6 +295,14 @@ class Polynomial:
         if all(x == 0 for x in self.coeff):
             return "0"
 
+        def wrap_expr(expr):
+            if self._has_int_coeff:
+                return expr
+            return f"({expr})"
+
+        def get_nth_expr(n):
+            return f"{wrap_expr(c if c != 1 else str())}{self.symbol}{append_pow(n)}"
+
         result = ""
         first = 0
         last = self.deg
@@ -302,10 +311,10 @@ class Polynomial:
         for i, c in enumerate(self.coeff):
             if c == 0:
                 continue
-            elif i == first and first != last:
-                result += f"{c if c != 1 else str()}{self.symbol}{append_pow(i)}"
             elif i == last:
                 result += f" + {c}" if first != last else f"{c}"
+            elif i == first:
+                result += get_nth_expr(i)
             else:
-                result += f" + {c if c != 1 else str()}{self.symbol}{append_pow(i)}"
+                result += f" + {get_nth_expr(i)}"
         return result

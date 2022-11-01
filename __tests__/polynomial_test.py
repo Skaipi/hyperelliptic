@@ -107,6 +107,14 @@ def test_to_string():
     assert str(gf.poly_zero) == "0"
     assert str(gf.poly([1, 0, 3, 1, 1])) == "x^4 + 3x^2 + x + 1"
     assert str(gf.poly([1, 0, 3, 1, 0])) == "x^4 + 3x^2 + x"
+    assert (
+        str(
+            gf.poly(
+                [gf.poly([1, 0, 3, 1, 1]), gf.poly([1, 0, 3, 1, 0]), gf.poly([0])], "y"
+            )
+        )
+        == "(x^4 + 3x^2 + x + 1)y^2 + (x^4 + 3x^2 + x)y"
+    )
 
 
 def test_derivative():
