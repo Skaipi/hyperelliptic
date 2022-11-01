@@ -18,6 +18,16 @@ if __name__ == "__main__":
 
     d = c.get_random_divisor()
     e = gf.rand_int()
-    print(e)
-    print(d)
-    print(d * e)
+    # print(e)
+    # print(d)
+    # print(d * e.value)
+
+    # print(d.u)
+    # print(d.v)
+    test = f % d.u
+    test2 = f // d.u + f % d.u
+    print(divmod(f, d.u))
+    print()
+    print(test2)
+    print()
+    print(test2.square_free_factors())
