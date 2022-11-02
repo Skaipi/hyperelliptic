@@ -164,8 +164,8 @@ class Polynomial:
             rand = gf.rand_poly(deg)
             g = self.gcd(rand)
             if g == self.one():
-                g = pow(rand, (gf.q**deg - 1) // 2, self) - self.one()
-            i = 0
+                g = (rand ** ((gf.q**deg - 1) // 2) - self.one()) % self
+
             for fac in factors:
                 if fac.deg <= deg:
                     continue
@@ -174,7 +174,6 @@ class Polynomial:
                     factors.remove(fac)
                     factors.append(d)
                     factors.append(fac // d)
-                i = i + 1
 
         return factors
 

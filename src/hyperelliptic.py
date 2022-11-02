@@ -22,11 +22,7 @@ class HC:
             raise ValueError("h(x) must be 0 for char(F) != 2")
 
         # TODO:
-        # If there is a point that satisfies:
-        # y^2 + h(x)y = f(x)
-        # 2y + h(x) = 0
-        # h'(x)y - f'(x) = 0
-        # then raise exception as C isn't smooth
+        # Check if C is smooth
 
     def divisor(self, a, b):
         return Divisor(self, a, b)
