@@ -56,6 +56,16 @@ def test_factorization():
     assert all(f in expected_439_factors for f in factors)
     assert len(factors) == len(expected_439_factors)
 
+    expected_64_factors = [2, 2, 2, 2, 2, 2]
+    factors = gf.factors(64)
+    assert all(f in expected_64_factors for f in factors)
+    assert len(factors) == len(expected_64_factors)
+
+    expected_2401_factors = [7, 7, 7, 7]
+    factors = gf.factors(2401)
+    assert all(f in expected_2401_factors for f in factors)
+    assert len(factors) == len(expected_2401_factors)
+
     too_big_to_factor = 728332861387732709516448268243094614312200863702341084222464
     with pytest.raises(ValueError):
         gf.factors(too_big_to_factor)
