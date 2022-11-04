@@ -36,3 +36,26 @@ def test_get_elements():
 
     gf = GaloisField(11)
     assert len([_ for _ in gf.get_elements()]) == gf.q
+
+
+def test_factorization():
+    gf = GaloisField(2)
+
+    expected_209_factors = [11, 19]
+    factors = gf.factors(209)
+    assert all(f in expected_209_factors for f in factors)
+    assert len(factors) == len(expected_209_factors)
+
+    expected_299_factors = [13, 23]
+    factors = gf.factors(299)
+    assert all(f in expected_299_factors for f in factors)
+    assert len(factors) == len(expected_299_factors)
+
+    expected_439_factors = [439]
+    factors = gf.factors(439)
+    assert all(f in expected_439_factors for f in factors)
+    assert len(factors) == len(expected_439_factors)
+
+    too_big_to_factor = 728332861387732709516448268243094614312200863702341084222464
+    with pytest.raises(ValueError):
+        gf.factors(too_big_to_factor)

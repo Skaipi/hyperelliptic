@@ -1,4 +1,6 @@
+from src.primes import PRIMES
 from random import randrange
+from math import gcd, log, floor
 
 
 def gf_operation(function):
@@ -11,7 +13,7 @@ def gf_operation(function):
     return function_wrapper
 
 
-def isPrime(p, k=32):
+def is_prime(p, k=32):
     # Miller-Rabin primality test
     if p == 2:
         return True
@@ -34,3 +36,43 @@ def isPrime(p, k=32):
         else:
             return False
     return True
+
+
+def factors(n):
+    factors = []
+
+    while n > 1:
+        x = factor(n)
+        factors.append(x)
+        n = n // x
+
+    return factors
+
+
+def factor(n, smoothness_bound=5):
+    # Factor small numbers with pollard's p - 1
+    if is_prime(n):
+        return n
+
+    max_bound = 1000
+    if smoothness_bound > max_bound:
+        raise ValueError(f"Can not factor {n}")
+
+    primes = list(filter(lambda x: x <= smoothness_bound, PRIMES))
+
+    m = 1
+    for p in primes:
+        m *= p ** floor(log(smoothness_bound, p))
+
+    a = 3 if n % 2 == 0 else 2
+    g = gcd(pow(a, m, n) - 1, n)
+    print(g)
+
+    if 1 < g < n:
+        return g
+
+    if g == 1:
+        return factor(n, smoothness_bound * 2)
+
+    if g == n:
+        raise ValueError(f"Can not factor {n}")

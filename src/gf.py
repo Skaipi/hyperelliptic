@@ -2,7 +2,7 @@ from src.polynomial import Polynomial
 from src.gf_polynomial import GF_Polynomial
 from src.hyperelliptic import HC
 from src.integer import ZP
-from src.utils import isPrime
+from src.utils import is_prime, factors
 from random import randint
 
 
@@ -16,7 +16,7 @@ class GaloisField:
             raise ValueError(
                 "Field with q != p must have defined irreducible polynomial"
             )
-        if not isPrime(p):
+        if not is_prime(p):
             raise ValueError(f"{p} is not prime")
 
         self.p = p
@@ -87,6 +87,9 @@ class GaloisField:
         if isinstance(a, ZP):
             return a.sqrt()
         raise ValueError(f"{a} does not have sqrt method")
+
+    def factors(self, n):
+        return factors(n)
 
     def get_elements(self, limit=0):
         if self.m == 1:
