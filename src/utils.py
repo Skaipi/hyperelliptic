@@ -49,7 +49,7 @@ def factors(n):
     return factors
 
 
-def factor(n, smoothness_bound=5):
+def factor(n, smoothness_bound=1):
     # Factor small numbers with pollard's p - 1
     if is_prime(n):
         return n
@@ -66,7 +66,6 @@ def factor(n, smoothness_bound=5):
 
     a = 3 if n % 2 == 0 else 2
     g = gcd(pow(a, m, n) - 1, n)
-    print(g)
 
     if 1 < g < n:
         return g
