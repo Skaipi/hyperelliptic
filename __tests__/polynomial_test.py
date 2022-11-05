@@ -167,3 +167,20 @@ def test_factorization():
     assert p1_multiplicity == 3
     assert p2_multiplicity == 2
     assert len(p3.factor()) == 2 and gf.poly([1, 6]) in p3.factor()
+
+
+def test_irreducibility():
+    gf = GaloisField(2)
+
+    poly = gf.poly([1, 0, 0, 0, 1, 1, 1, 0, 1])
+    assert poly.is_irreducible() == True
+
+    poly = gf.poly([1, 0, 0, 0, 1, 1, 0, 1, 1])
+    assert poly.is_irreducible() == True
+
+    poly = gf.poly([1, 0, 1, 0, 1, 0, 0, 0])
+    assert poly.is_irreducible() == False
+
+    gf = GaloisField(7)
+    poly = gf.poly([1, 6, 1, 3, 0, 6, 5])
+    assert poly.is_irreducible() == False

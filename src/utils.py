@@ -15,7 +15,11 @@ def gf_operation(function):
 
 def is_prime(p, k=32):
     # Miller-Rabin primality test
+    if p < 2:
+        return False
     if p == 2:
+        return True
+    if p == 3:
         return True
     if p % 2 == 0:
         return False
