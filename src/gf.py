@@ -8,8 +8,6 @@ from random import randint
 
 class GaloisField:
     def __init__(self, p, m=1, polynomial_coeff=None):
-        # TODO:
-        # Check i polynomial is set and if it's irreducible
         if m < 1:
             raise ValueError(f"Invalid exponent parameter for GF: {m}")
         if m > 1 and polynomial_coeff == None:
@@ -27,6 +25,9 @@ class GaloisField:
             if polynomial_coeff
             else None
         )
+
+        if self._poly != None and not self._poly.is_irreducible():
+            raise ValueError(f"{self._poly} is not irreducible")
 
     @property
     def zero(self):

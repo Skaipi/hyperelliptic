@@ -144,7 +144,7 @@ class Polynomial:
 
         i = 1
         while i <= self.deg // 2:
-            h = pow(x, gf.q, poly)
+            h = pow(x, gf.p, poly)
             g = poly.gcd(h - x)
             if g != self.one():
                 factors.append((g, i))
@@ -157,6 +157,7 @@ class Polynomial:
         return factors
 
     def equal_degree_factors(self, deg):
+        # Cantor–Zassenhaus algorithm
         gf = self.gf
         factors = [self._from_coeff(self.coeff)]
 
@@ -164,7 +165,7 @@ class Polynomial:
             rand = gf.rand_poly(deg)
             g = self.gcd(rand)
             if g == self.one():
-                g = (rand ** ((gf.q**deg - 1) // 2) - self.one()) % self
+                g = (rand ** ((gf.p**deg - 1) // 2) - self.one()) % self
 
             for fac in factors:
                 if fac.deg <= deg:
@@ -176,6 +177,33 @@ class Polynomial:
                     factors.append(fac // d)
 
         return factors
+
+    def is_irreducible(self):
+        # Rabin test of irreducibility
+        if self.gf == None:
+            raise ValueError(
+                "Polynomial must be defined over finite field to check irreducibility"
+            )
+
+        gf = self.gf
+        deg_factors = self.gf.factors(self.deg)
+        quotients = set([self.deg // factor for factor in deg_factors])
+        x = self._from_coeff([gf(1), gf(0)])
+
+        prev_h = x
+        prev_q = 0
+        for quotient in quotients:
+            h = pow(prev_h, pow(gf.p, quotient - prev_q), self)
+            g = self.gcd((h - x) % self)
+            if g != self.one():
+                return False
+            prev_h, prev_q = h, quotient
+        g = pow(prev_h, pow(gf.p, self.deg - prev_q), self)
+        g = (g - x) % self
+
+        if g == self.zero():
+            return True
+        return False
 
     def _from_coeff(self, coeff):
         return Polynomial(coeff, self.gf, self.symbol)
@@ -231,11 +259,15 @@ class Polynomial:
         sq = self
         result = self.one()
         while exp > 0:
-            if exp & 1:
-                result *= sq
+            if exp % 2 == 1:
+                result = result * sq
+                if mod != None:
+                    result = result % mod
             sq *= sq
-            exp >>= 1
-        return result if mod is None else result % mod
+            if mod != None:
+                sq = sq % mod
+            exp = exp // 2
+        return result
 
     def __div__(self, other):
         if isinstance(other, self.coeff[0].__class__):
