@@ -1,3 +1,4 @@
+from src.integer import ZP
 from src.utils import gf_operation
 from random import randint
 
@@ -166,17 +167,18 @@ class Divisor:
         return Divisor(self.c, u, v).to_reduced()
 
     def __mul__(self, other):
-        if not isinstance(other, int):
+        if not isinstance(other, int) and not isinstance(other, ZP):
             raise ValueError(f"Divisor cannot be multiplied by {other}")
 
         tmp = self
+        exp = other if isinstance(other, int) else other.value
         result = Divisor.zero(self.c)
 
-        while other:
-            if other & 1:
+        while exp:
+            if exp % 2 == 1:
                 result += tmp
             tmp += tmp
-            other >>= 1
+            exp = exp // 2
         return result
 
     def __neg__(self):
