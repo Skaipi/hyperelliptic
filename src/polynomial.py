@@ -253,11 +253,14 @@ class Polynomial:
     def __rmul__(self, other):
         return self.__mul__(other)
 
-    def __pow__(self, exp, mod=None):
-        if not isinstance(exp, int):
+    def __pow__(self, other, mod=None):
+        if not is_int_like(other):
             raise NotImplementedError(f"Polynomial exp error (exp = {exp})")
+
         sq = self
+        exp = other if isinstance(other, int) else other.value
         result = self.one()
+
         while exp > 0:
             if exp % 2 == 1:
                 result = result * sq
