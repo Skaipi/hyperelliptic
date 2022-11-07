@@ -6,9 +6,11 @@ def test_comparison():
     gf = GaloisField(7)
     x = gf(5)
 
-    assert x == 5
+    assert x == 5 == gf(5)
     assert x < 6
+    assert x < gf(6)
     assert x > 4
+    assert x > gf(4)
 
 
 def test_overflow_contructor_comparison():
@@ -29,6 +31,10 @@ def test_addition():
     assert gf(13) + gf(21) == 1
     assert gf(4) + 5 == 9
 
+    gf_2 = GaloisField(7)
+    with pytest.raises(ValueError):
+        gf(10) + gf_2(7)
+
 
 def test_substraction():
     gf = GaloisField(11)
@@ -39,6 +45,10 @@ def test_substraction():
     assert gf(10) - gf(122) == 9
     assert gf(4) - 5 == -1
 
+    gf_2 = GaloisField(7)
+    with pytest.raises(ValueError):
+        gf(10) - gf_2(7)
+
 
 def test_multiplication():
     gf = GaloisField(11)
@@ -48,6 +58,10 @@ def test_multiplication():
     assert gf(8) * gf(1) == 8
     assert gf(125) * gf(0) == 0
     assert gf(4) * 4 == 5
+
+    gf_2 = GaloisField(7)
+    with pytest.raises(ValueError):
+        gf(10) * gf_2(7)
 
 
 def test_division():
@@ -60,12 +74,19 @@ def test_division():
     with pytest.raises(ZeroDivisionError):
         gf(7) / gf(11)
 
+    gf_2 = GaloisField(7)
+    with pytest.raises(ValueError):
+        gf(10) / gf_2(7)
+
 
 def test_exponentiation():
     gf = GaloisField(11)
 
     assert gf(2) ** 2 == 4
     assert gf(7) ** 11 == 7
+
+    with pytest.raises(ValueError):
+        gf(2) ** gf(7)
 
 
 def test_sqrt():
@@ -92,3 +113,19 @@ def test_hash():
 
     random_integers = [gf.rand_int() for i in range(20)]
     list(set(random_integers))
+
+
+def test_to_string():
+    gf = GaloisField(11)
+
+    assert str(gf(10)) == "10"
+    assert str(gf(7)) == "7"
+    assert str(gf(5)) == "5"
+
+
+def test_repr():
+    gf = GaloisField(11)
+
+    assert repr(gf(10)) == "10"
+    assert repr(gf(7)) == "7"
+    assert repr(gf(5)) == "5"

@@ -52,6 +52,14 @@ def test_division():
     assert divmod(p1, p3) == (gf.element([1, 0, 1, 0]), gf.zero)
     assert divmod(p2, p3) == (gf.element([1, 0]), gf.one)
 
+    assert p1 % p2 == gf.zero
+    assert p1 % p3 == gf.zero
+    assert p2 % p3 == gf.one
+
+    assert p1 // p2 == gf.element([1, 0, 0])
+    assert p1 // p3 == gf.element([1, 0, 1, 0])
+    assert p2 // p3 == gf.element([1, 0])
+
 
 def test_inversion():
     gf = GaloisField(2, 5, [1, 0, 0, 1, 0, 1])
@@ -72,3 +80,28 @@ def test_exponentiation():
     assert p1**1 == p1
     assert p1**6 == gf.element([1, 0, 1, 0])
     assert p1**15 == gf.element([1, 1, 1, 1, 1])
+
+
+def test_to_monic():
+    gf = GaloisField(7, 3, [1, 6, 0, 4])
+
+    p1 = gf.element([3, 4, 2])
+    assert p1.to_monic() == gf.element([1, 6, 3])
+
+
+def test_to_string():
+    gf = GaloisField(2, 5, [1, 0, 0, 1, 0, 1])
+
+    p1 = gf.element([1, 0, 1, 0, 0])
+    assert str(p1) == "a^4 + a^2"
+    assert str(gf.element([1])) == "1"
+    assert str(gf.element([0])) == "0"
+
+
+def test_repr():
+    gf = GaloisField(2, 5, [1, 0, 0, 1, 0, 1])
+
+    p1 = gf.element([1, 0, 1, 0, 0])
+    assert repr(p1) == "a^4 + a^2"
+    assert repr(gf.element([1])) == "1"
+    assert repr(gf.element([0])) == "0"

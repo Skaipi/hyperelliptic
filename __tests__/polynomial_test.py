@@ -117,6 +117,15 @@ def test_to_string():
     )
 
 
+def test_repr():
+    gf = GaloisField(11)
+
+    assert repr(gf.poly_one) == "1"
+    assert repr(gf.poly_zero) == "0"
+    assert repr(gf.poly([1, 0, 3, 1, 1])) == "x^4 + 3x^2 + x + 1"
+    assert repr(gf.poly([1, 0, 3, 1, 0])) == "x^4 + 3x^2 + x"
+
+
 def test_derivative():
     gf = GaloisField(11)
 
