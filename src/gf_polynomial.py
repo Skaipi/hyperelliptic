@@ -26,7 +26,7 @@ class GF_Polynomial:
         return self._poly.xgcd(other._poly)
 
     def to_monic(self):
-        return self._poly.to_monic()
+        return self._from_zp_polynomial(self._poly.to_monic())
 
     def inverse(self):
         if self == self.zero():
@@ -60,10 +60,6 @@ class GF_Polynomial:
             return self._from_zp_polynomial(self._poly * other)
         result = self._poly * other._poly
         return self._from_zp_polynomial(result)
-
-    @gf_operation
-    def __rmul__(self, other):
-        return self.__mul__(other)
 
     @gf_operation
     def __pow__(self, other):
@@ -106,6 +102,7 @@ class GF_Polynomial:
     def __repr__(self):
         return str(self)
 
+    @gf_operation
     def __eq__(self, other):
         if isinstance(other, ZP) or isinstance(other, int):
             return self._poly == other
