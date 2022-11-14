@@ -30,12 +30,22 @@ def test_different_gf():
 
 
 def test_get_elements():
-    gf = GaloisField(7, 4, [1, 0, 5, 4, 3])
+    gf = GaloisField(7)
+    poly = gf.poly([1, 0, 5, 4, 3])
+    gf = gf.extension(poly)
 
     assert len([_ for _ in gf.get_elements()]) == gf.q
 
     gf = GaloisField(11)
     assert len([_ for _ in gf.get_elements()]) == gf.q
+
+
+def test_random_irreducible_poly():
+    gf = GaloisField(11)
+
+    for i in range(2, 5):
+        p = gf.rand_irreducible_poly(i)
+        assert p.is_irreducible()
 
 
 def test_factorization():

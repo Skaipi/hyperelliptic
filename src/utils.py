@@ -5,8 +5,8 @@ from math import gcd, log, floor
 
 def gf_operation(function):
     def function_wrapper(a, b):
-        is_int_operation = isinstance(a, int) or isinstance(b, int)
-        if not is_int_operation and a.gf != b.gf:
+        is_field_operation = type(a) == type(b)
+        if is_field_operation and a.gf != b.gf:
             raise ValueError(f"{a} field does not match {b} field")
         return function(a, b)
 

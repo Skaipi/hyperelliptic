@@ -7,10 +7,10 @@ from random import randint
 
 
 class GaloisField:
-    def __init__(self, p, m=1, polynomial_coeff=None):
+    def __init__(self, p, m=1, polynomial=None):
         if m < 1:
             raise ValueError(f"Invalid exponent parameter for GF: {m}")
-        if m > 1 and polynomial_coeff == None:
+        if m > 1 and polynomial == None:
             raise ValueError(
                 "Field with q != p must have defined irreducible polynomial"
             )
@@ -20,11 +20,10 @@ class GaloisField:
         self.p = p
         self.m = m
         self.q = p**m
-        self._poly = (
-            Polynomial(self._parse_coeff(polynomial_coeff), self)
-            if polynomial_coeff
-            else None
-        )
+        self._poly = polynomial
+
+        if self._poly:
+            self._fix_coeff()
 
         if self._poly != None and not self._poly.is_irreducible():
             raise ValueError(f"{self._poly} is not irreducible")
@@ -57,6 +56,9 @@ class GaloisField:
     def poly_one(self):
         return Polynomial([self.one], self)
 
+    def extension(self, polynomial):
+        return GaloisField(self.p, polynomial.deg, polynomial)
+
     def int(self, value):
         return ZP(self, value)
 
@@ -71,6 +73,13 @@ class GaloisField:
 
     def rand_int(self):
         return self.int(randint(0, self.p - 1))
+
+    def rand_irreducible_poly(self, deg):
+        leading_coeff = self.one
+        poly = self.poly([leading_coeff] + [self.rand_int() for _ in range(deg)])
+        while not poly.is_irreducible():
+            poly = self.poly([leading_coeff] + [self.rand_int() for _ in range(deg)])
+        return poly
 
     def rand_poly(self, deg):
         return self.poly([self.rand_int() for _ in range(deg + 1)])
@@ -122,3 +131,8 @@ class GaloisField:
 
     def _parse_coeff(self, coeff):
         return list(map(lambda x: ZP(self, x) if isinstance(x, int) else x, coeff))
+
+    # Change filed of polynomial coefficients to extension field
+    def _fix_coeff(self):
+        fixed_coeff = list(map(lambda x: ZP(self, x.value), self._poly.coeff))
+        self._poly = self.poly(fixed_coeff)

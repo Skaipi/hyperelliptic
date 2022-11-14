@@ -3,7 +3,9 @@ from src.gf import GaloisField
 
 
 def test_addition():
-    gf = GaloisField(2, 5, [1, 0, 0, 1, 0, 1])
+    gf = GaloisField(2)
+    poly = gf.poly([1, 0, 0, 1, 0, 1])
+    gf = gf.extension(poly)
 
     p = gf.element([1, 0, 1, 0])
     o = gf(1)
@@ -15,7 +17,9 @@ def test_addition():
 
 
 def test_substraction():
-    gf = GaloisField(2, 5, [1, 0, 0, 1, 0, 1])
+    gf = GaloisField(2)
+    poly = gf.poly([1, 0, 0, 1, 0, 1])
+    gf = gf.extension(poly)
 
     p = gf.element([1, 0, 1, 0])
     o = gf(1)
@@ -27,7 +31,9 @@ def test_substraction():
 
 
 def test_multiplication():
-    gf = GaloisField(2, 5, [1, 0, 0, 1, 0, 1])
+    gf = GaloisField(2)
+    poly = gf.poly([1, 0, 0, 1, 0, 1])
+    gf = gf.extension(poly)
 
     p = gf.element([1, 0, 1, 0])
     o = gf(1)
@@ -39,7 +45,9 @@ def test_multiplication():
 
 
 def test_division():
-    gf = GaloisField(2, 5, [1, 0, 0, 1, 0, 1])
+    gf = GaloisField(2)
+    poly = gf.poly([1, 0, 0, 1, 0, 1])
+    gf = gf.extension(poly)
 
     p = gf.element([1, 0, 1, 0])
     o = gf(1)
