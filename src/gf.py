@@ -74,6 +74,11 @@ class GaloisField:
     def rand_int(self):
         return self.int(randint(0, self.p - 1))
 
+    def rand_element(self):
+        if self.m == 1:
+            return self.rand_int()
+        return self.element([self.rand_int() for _ in range(self.m)])
+
     def rand_irreducible_poly(self, deg):
         leading_coeff = self.one
         poly = self.poly([leading_coeff] + [self.rand_int() for _ in range(deg)])
@@ -82,7 +87,7 @@ class GaloisField:
         return poly
 
     def rand_poly(self, deg):
-        return self.poly([self.rand_int() for _ in range(deg + 1)])
+        return self.poly([self.rand_element() for _ in range(deg + 1)])
 
     def poly(self, coeff, symbol="x"):
         parsed_coeff = self._parse_coeff(coeff)

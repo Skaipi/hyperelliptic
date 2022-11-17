@@ -72,12 +72,10 @@ class GF_Polynomial:
         return self._from_zp_polynomial(r1), self._from_zp_polynomial(r2)
 
     @gf_operation
-    def __div__(self, other):
-        return self._from_zp_polynomial(self._poly / other)
-
-    @gf_operation
     def __truediv__(self, other):
-        return self._from_zp_polynomial(self._poly / other)
+        if isinstance(other, ZP) or isinstance(other, int):
+            return self._from_zp_polynomial(self._poly / other)
+        return self._from_zp_polynomial(self._poly * other.inverse())
 
     def __neg__(self):
         return self._from_zp_polynomial(-self._poly)

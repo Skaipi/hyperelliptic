@@ -19,7 +19,7 @@ class HC:
             raise ValueError("Degree of function f must be an odd number")
         if h.deg > self.g:
             raise ValueError("Invalid function h for Curve of given genus")
-        if gf.p != 2 and h != h.zero():
+        if gf.p != 2 and h != 0:
             raise ValueError("h(x) must be 0 for char(F) != 2")
 
         # TODO:
