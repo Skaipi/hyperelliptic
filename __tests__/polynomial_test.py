@@ -115,6 +115,20 @@ def test_to_string():
         )
         == "(x^4 + 3x^2 + x + 1)y^2 + (x^4 + 3x^2 + x)y"
     )
+    assert (
+        str(
+            gf.poly(
+                [
+                    gf.poly([1]),
+                    gf.poly([1, 0, 3, 1, 1]),
+                    gf.poly([1, 0, 3, 1, 0]),
+                    gf.poly([0]),
+                ],
+                "y",
+            )
+        )
+        == "y^3 + (x^4 + 3x^2 + x + 1)y^2 + (x^4 + 3x^2 + x)y"
+    )
 
 
 def test_repr():

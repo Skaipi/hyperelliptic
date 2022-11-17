@@ -41,7 +41,7 @@ class Polynomial:
 
     def to_monic(self):
         c = self.coeff[0]
-        if c > 1:
+        if c != 1:
             return self / c
         return self
 
@@ -272,13 +272,10 @@ class Polynomial:
             exp = exp // 2
         return result
 
-    def __div__(self, other):
-        if isinstance(other, self.coeff[0].__class__):
-            return self._from_coeff(list(map(lambda x: x / other, self.coeff)))
-        raise ValueError("Cannot divide polynomial by other type than int")
-
     def __truediv__(self, other):
-        return self.__div__(other)
+        if isinstance(other, self.coeff[0].__class__) or is_int_like(other):
+            return self._from_coeff(list(map(lambda x: x / other, self.coeff)))
+        return NotImplemented
 
     @same_type_coeff
     def __divmod__(self, other):
@@ -334,8 +331,10 @@ class Polynomial:
                 return expr
             return f"({expr})"
 
-        def get_nth_expr(n):
-            return f"{wrap_expr(c if c != 1 else str())}{self.symbol}{append_pow(n)}"
+        def get_nth_expr(n, c):
+            if c != 1:
+                return f"{wrap_expr(c)}{self.symbol}{append_pow(n)}"
+            return f"{self.symbol}{append_pow(n)}"
 
         result = ""
         first = 0
@@ -348,7 +347,7 @@ class Polynomial:
             elif i == last:
                 result += f" + {c}" if first != last else f"{c}"
             elif i == first:
-                result += get_nth_expr(i)
+                result += get_nth_expr(i, c)
             else:
-                result += f" + {get_nth_expr(i)}"
+                result += f" + {get_nth_expr(i, c)}"
         return result
