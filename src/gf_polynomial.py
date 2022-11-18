@@ -35,7 +35,67 @@ class GF_Polynomial:
         d, a, b = self.xgcd(self.gf)
         if not d.isConst():
             raise Exception("Element has no inverse!")
-        return self._from_zp_polynomial(a.to_monic())
+
+        return self._from_zp_polynomial(a / d.toInt())
+
+    def value(self):
+        result = 0
+        for i, c in enumerate(self.coeff[::-1]):
+            result += c * self.gf.p**i
+        return result
+
+    def sqrt(self):
+        # Tonelli-Shanks algorithm
+        if not self.is_quadratic_residue():
+            raise ValueError(f"Argument {self} has no square root")
+
+        if self == self.zero():
+            return self.zero()
+
+        p = self.gf.q
+        q = p - 1
+        s = 0  # S must be an integer, not ZP
+
+        # find Q and S such that p - 1 = Q * 2^S
+        while q % 2 == 0:
+            q //= 2
+            s += 1
+
+        if s == 1:
+            return pow(self, (p + 1) // 4)
+
+        # Find z that is not quadratic residue
+        z = self.gf.rand_element()
+        while z.is_quadratic_residue():
+            z = self.gf.rand_element()
+
+        c = pow(z, q)
+        t = pow(self, q)
+        r = pow(self, (q + 1) // 2)
+        m = s
+
+        while True:
+            if t == 1:
+                return r
+
+            # Find the least i such that t^2^i = 1
+            i = 1
+            while pow(t, pow(2, i)) != 1:
+                i += 1
+
+            b = pow(c, pow(2, m - i - 1))
+            m = i
+            c = pow(b, 2)
+            t = t * c
+            r = r * b
+
+    def is_quadratic_residue(self):
+        if self.legendre() == self.one() or self == self.zero():
+            return True
+        return False
+
+    def legendre(self):
+        return pow(self, ((self.gf.q - 1) // 2))
 
     def _from_zp_polynomial(self, poly):
         return GF_Polynomial(self.gf, poly.coeff, poly.symbol)
@@ -46,6 +106,10 @@ class GF_Polynomial:
             return self._from_zp_polynomial(self._poly + other)
         result = self._poly + other._poly
         return self._from_zp_polynomial(result)
+
+    @gf_operation
+    def __radd__(self, other):
+        return self.__add__(other)
 
     @gf_operation
     def __sub__(self, other):
@@ -62,8 +126,12 @@ class GF_Polynomial:
         return self._from_zp_polynomial(result)
 
     @gf_operation
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    @gf_operation
     def __pow__(self, other):
-        result = self._poly**other
+        result = pow(self._poly, other, self.gf._poly)
         return self._from_zp_polynomial(result)
 
     @gf_operation
@@ -77,6 +145,22 @@ class GF_Polynomial:
             return self._from_zp_polynomial(self._poly / other)
         return self._from_zp_polynomial(self._poly * other.inverse())
 
+    @gf_operation
+    def __mod__(self, other):
+        return divmod(self, other)[1]
+
+    @gf_operation
+    def __floordiv__(self, other):
+        return divmod(self, other)[0]
+
+    @gf_operation
+    def __eq__(self, other):
+        if isinstance(other, ZP) or isinstance(other, int):
+            return self._poly == other
+        if isinstance(other, GF_Polynomial):
+            return self._poly == other._poly
+        return False
+
     def __neg__(self):
         return self._from_zp_polynomial(-self._poly)
 
@@ -86,24 +170,11 @@ class GF_Polynomial:
             result += x**i * c
         return result
 
-    @gf_operation
-    def __mod__(self, other):
-        return divmod(self, other)[1]
-
-    @gf_operation
-    def __floordiv__(self, other):
-        return divmod(self, other)[0]
-
     def __str__(self):
         return str(self._poly)
 
     def __repr__(self):
         return str(self)
 
-    @gf_operation
-    def __eq__(self, other):
-        if isinstance(other, ZP) or isinstance(other, int):
-            return self._poly == other
-        if isinstance(other, GF_Polynomial):
-            return self._poly == other._poly
-        return False
+    def __hash__(self):
+        return self.value().value

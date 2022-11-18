@@ -101,6 +101,8 @@ class GaloisField:
             a = self.int(a)
         if isinstance(a, ZP):
             return a.sqrt()
+        if isinstance(a, GF_Polynomial):
+            return a.sqrt()
         raise ValueError(f"{a} does not have sqrt method")
 
     def factors(self, n):
