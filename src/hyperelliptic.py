@@ -50,6 +50,9 @@ class HC:
             point = self._point_from_x(x) if x != self.gf.p else INF_POINT
         return point
 
+    def infinity_point(self):
+        return INF_POINT
+
     def point_inverse(self, point):
         if point == INF_POINT:
             return point
@@ -133,7 +136,7 @@ class Divisor:
 
         c, u, v = self.c, self.u, self.v
         u_factors = u.factors()
-        if len(u_factors) < c.g:
+        if len(u_factors) < u.deg:
             raise ValueError("Divisor has non F-rational points in supp")
         roots = [-factor.coeff[-1] for factor in u_factors]
         points = [c._point_from_x(root) for root in roots]
