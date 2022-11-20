@@ -46,8 +46,8 @@ class HC:
     def get_random_point(self):
         point = None
         while point == None:
-            x = self.gf.rand_int()
-            point = self._point_from_x(x)
+            x = randint(0, self.gf.p)
+            point = self._point_from_x(x) if x != self.gf.p else INF_POINT
         return point
 
     def point_inverse(self, point):
@@ -132,7 +132,9 @@ class Divisor:
             return self._points
 
         c, u, v = self.c, self.u, self.v
-        u_factors = u.factor()
+        u_factors = u.factors()
+        if len(u_factors) < c.g:
+            raise ValueError("Divisor has non F-rational points in supp")
         roots = [-factor.coeff[-1] for factor in u_factors]
         points = [c._point_from_x(root) for root in roots]
         valid_points = [p if v(p[0]) == p[1] else c.point_inverse(p) for p in points]
@@ -144,24 +146,30 @@ class Divisor:
     def to_reduced(self):
         u, v, f, h, g = self.u, self.v, self.c.f, self.c.h, self.c.g
 
-        while u.deg > g:
-            u = (f - v * h - v * v) // u
-            v = (-h - v) % u
+        _u = (f - v * h - v * v) // u
+        _v = (-h - v) % _u
+        while _u.deg > g:
+            _u = (f - v * h - v * v) // _u
+            _v = (-h - v) % _u
 
-        c = u.coeff[0]
-        u = u / c
+        _u = _u.to_monic()
 
-        return Divisor(self.c, u, v)
+        return Divisor(self.c, _u, _v)
 
     @gf_operation
     def __add__(self, other):
+        if self == Divisor.zero(self.c):
+            return other
+        if other == Divisor.zero(self.c):
+            return self
+
         u1, u2, v1, v2 = self.u, other.u, self.v, other.v
         d1, e1, e2 = u1.xgcd(u2)
         d, c1, c2 = d1.xgcd(v1 + v2 + self.c.h)
         s1 = c1 * e1
         s2 = c1 * e2
         s3 = c2
-        u = (u1 * u2) // (d * d)
+        u = (u1 * u2) // d**2
         v = ((s1 * u1 * v2 + s2 * u2 * v1 + s3 * (v1 * v2 + self.c.f)) // d) % u
 
         return Divisor(self.c, u, v).to_reduced()
@@ -192,3 +200,6 @@ class Divisor:
 
     def __str__(self):
         return f"D: {str(self.u)} | {str(self.v)}"
+
+    def __repr__(self):
+        return str(self)

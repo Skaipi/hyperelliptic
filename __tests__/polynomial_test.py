@@ -177,7 +177,7 @@ def test_factorization():
     p3 = gf.poly([1, 1, 3])
 
     p = p1**3 * p2**2
-    factors = p.factor()
+    factors = p.factors()
 
     p1_multiplicity = 0
     p2_multiplicity = 0
@@ -189,7 +189,7 @@ def test_factorization():
 
     assert p1_multiplicity == 3
     assert p2_multiplicity == 2
-    assert len(p3.factor()) == 2 and gf.poly([1, 6]) in p3.factor()
+    assert len(p3.factors()) == 2 and gf.poly([1, 6]) in p3.factors()
 
 
 def test_irreducibility():
