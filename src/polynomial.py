@@ -93,7 +93,7 @@ class Polynomial:
         return r1, s1, t1
 
     # https://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
-    def factor(self):
+    def factors(self):
         if self.gf == None:
             raise ValueError(
                 "Polynomial must be defined over finite field to be factored"
@@ -132,7 +132,7 @@ class Polynomial:
         # Step two
         if c != self.one():
             coeff = [x ** (gf.p ** (gf.m - 1)) for x in c.coeff]
-            factors.extend(gf.poly(coeff).factor())
+            factors.extend(gf.poly(coeff).square_free_factors())
 
         return factors
 
