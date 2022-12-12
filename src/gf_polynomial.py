@@ -1,11 +1,11 @@
-from src.polynomial import Polynomial
+from src.field_polynomial import FieldPolynomial
 from src.utils import gf_operation
 from src.integer import ZP
 
 
 class GF_Polynomial:
     def __init__(self, gf, coeff, symbol="a") -> None:
-        self._poly = Polynomial(coeff, gf, symbol) % gf._poly
+        self._poly = FieldPolynomial(coeff, gf, symbol) % gf._poly
         self.coeff = self._poly.coeff
         self.symbol = symbol
         self.gf = gf
@@ -28,6 +28,12 @@ class GF_Polynomial:
     def to_monic(self):
         return self._from_zp_polynomial(self._poly.to_monic())
 
+    def to_int(self):
+        result = 0
+        for i, c in enumerate(self.coeff[::-1]):
+            result += c * self.gf.p**i
+        return result
+
     def inverse(self):
         if self == self.zero():
             raise ZeroDivisionError("Element 0 has no inverse")
@@ -37,12 +43,6 @@ class GF_Polynomial:
             raise Exception("Element has no inverse!")
 
         return self._from_zp_polynomial(a / d.toInt())
-
-    def value(self):
-        result = 0
-        for i, c in enumerate(self.coeff[::-1]):
-            result += c * self.gf.p**i
-        return result
 
     def sqrt(self):
         # Tonelli-Shanks algorithm
@@ -177,4 +177,4 @@ class GF_Polynomial:
         return str(self)
 
     def __hash__(self):
-        return self.value().value
+        return self.to_int().value

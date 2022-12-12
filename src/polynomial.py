@@ -6,9 +6,13 @@ def is_int_like(obj):
     return isinstance(obj, int) or isinstance(obj, ZP)
 
 
+def is_number_like(obj):
+    return is_int_like(obj) or isinstance(obj, float)
+
+
 def same_type_coeff(function):
     def wrapper(poly_a, poly_b):
-        if is_int_like(poly_a) or is_int_like(poly_b):
+        if is_number_like(poly_a) or is_number_like(poly_b):
             return function(poly_a, poly_b)
 
         ca, cb = poly_a.coeff[0], poly_b.coeff[0]
@@ -23,10 +27,9 @@ def same_type_coeff(function):
 
 
 class Polynomial:
-    def __init__(self, coeff, field=None, symbol="x") -> None:
+    def __init__(self, coeff, symbol="x") -> None:
         self.coeff = self._strip(coeff)
         self.symbol = symbol
-        self.gf = field
         self._has_int_coeff = is_int_like(self.coeff[0])
 
     @property
@@ -46,13 +49,9 @@ class Polynomial:
         return self
 
     def coeff_zero(self):
-        if self.gf != None:
-            return self.gf.int_zero
         return 0
 
     def coeff_one(self):
-        if self.gf != None:
-            return self.gf.int_one
         return 1
 
     def isConst(self):
@@ -92,121 +91,8 @@ class Polynomial:
 
         return r1, s1, t1
 
-    # https://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
-    def factors(self):
-        if self.gf == None:
-            raise ValueError(
-                "Polynomial must be defined over finite field to be factored"
-            )
-
-        factors = []
-        sf_factors = self.square_free_factors()
-
-        for sf_factor in sf_factors:
-            df_factors = sf_factor.distinct_degree_factors()
-
-            for df_factor, deg in df_factors:
-                ed_factors = df_factor.equal_degree_factors(deg)
-                factors.extend(ed_factors)
-
-        return factors
-
-    def square_free_factors(self):
-        gf = self.gf
-        factors = []
-
-        c = self.gcd(self.derivative())
-        w = self // c
-
-        # Step one
-        i = 1
-        while w != self.one():
-            y = w.gcd(c)
-            fac = w // y
-            if fac != self.one() and i % gf.p != 0:
-                [factors.append(fac) for _ in range(i)]
-            w = y
-            c = c // y
-            i = i + 1
-
-        # Step two
-        if c != self.one():
-            coeff = [x ** (gf.p ** (gf.m - 1)) for x in c.coeff]
-            factors.extend(gf.poly(coeff).square_free_factors())
-
-        return factors
-
-    def distinct_degree_factors(self):
-        gf = self.gf
-        factors = []
-        poly = self._from_coeff(self.coeff)
-        x = self._from_coeff([gf(1), gf(0)])
-
-        i = 1
-        while i <= self.deg // 2:
-            h = pow(x, gf.p, poly)
-            g = poly.gcd(h - x)
-            if g != self.one():
-                factors.append((g, i))
-                poly = poly // g
-                h = h % poly
-            i = i + 1
-
-        if poly != self.one():
-            factors.append((poly, poly.deg))
-        return factors
-
-    def equal_degree_factors(self, deg):
-        # Cantor–Zassenhaus algorithm
-        gf = self.gf
-        factors = [self._from_coeff(self.coeff)]
-
-        while len(factors) < self.deg // deg:
-            rand = gf.rand_poly(deg)
-            g = self.gcd(rand)
-            if g == self.one():
-                g = (rand ** ((gf.p**deg - 1) // 2) - self.one()) % self
-
-            for fac in factors:
-                if fac.deg <= deg:
-                    continue
-                d = g.gcd(fac)
-                if d not in [self.one(), fac]:
-                    factors.remove(fac)
-                    factors.append(d)
-                    factors.append(fac // d)
-
-        return factors
-
-    def is_irreducible(self):
-        # Rabin test of irreducibility
-        if self.gf == None:
-            raise ValueError(
-                "Polynomial must be defined over finite field to check irreducibility"
-            )
-
-        gf = self.gf
-        deg_factors = self.gf.factors(self.deg)
-        quotients = set([self.deg // factor for factor in deg_factors])
-        x = self._from_coeff([gf(1), gf(0)])
-
-        prev_h = x
-        prev_q = 0
-        for quotient in quotients:
-            h = pow(prev_h, pow(gf.p, quotient - prev_q), self)
-            g = self.gcd((h - x) % self)
-            if g != self.one():
-                return False
-            prev_h, prev_q = h, quotient
-        g = pow(prev_h, pow(gf.p, self.deg - prev_q), self)
-        g = (g - x) % self
-
-        if g == self.zero():
-            return True
-        return False
-
     def _from_coeff(self, coeff):
-        return Polynomial(coeff, self.gf, self.symbol)
+        return Polynomial(coeff, self.symbol)
 
     def _strip(self, arr):
         index = -1
@@ -240,7 +126,7 @@ class Polynomial:
 
     @same_type_coeff
     def __mul__(self, other):
-        if is_int_like(other):
+        if is_number_like(other):
             return self._from_coeff(list(map(lambda x: x * other, self.coeff)))
 
         result = [self.coeff_zero()] * (self.deg + other.deg + 1)
