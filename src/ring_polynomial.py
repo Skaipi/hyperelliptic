@@ -1,7 +1,7 @@
 from src.polynomial import Polynomial
 
 
-class FieldPolynomial(Polynomial):
+class RingPolynomial(Polynomial):
     def __init__(self, coeff, field=None, symbol="x"):
         super().__init__(coeff, symbol)
         self.gf = field
@@ -126,4 +126,4 @@ class FieldPolynomial(Polynomial):
         return False
 
     def _from_coeff(self, coeff):
-        return FieldPolynomial(coeff, self.gf, self.symbol)
+        return RingPolynomial(coeff, self.gf, self.symbol)
