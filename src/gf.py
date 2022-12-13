@@ -1,4 +1,4 @@
-from src.field_polynomial import FieldPolynomial
+from src.ring_polynomial import RingPolynomial
 from src.gf_polynomial import GF_Polynomial
 from src.hyperelliptic import HC
 from src.integer import ZP
@@ -50,11 +50,11 @@ class GaloisField:
 
     @property
     def poly_zero(self):
-        return FieldPolynomial([self.zero], self)
+        return RingPolynomial([self.zero], self)
 
     @property
     def poly_one(self):
-        return FieldPolynomial([self.one], self)
+        return RingPolynomial([self.one], self)
 
     def extension(self, polynomial):
         return GaloisField(self.p, polynomial.deg, polynomial)
@@ -91,7 +91,7 @@ class GaloisField:
 
     def poly(self, coeff, symbol="x"):
         parsed_coeff = self._parse_coeff(coeff)
-        return FieldPolynomial(parsed_coeff, self, symbol)
+        return RingPolynomial(parsed_coeff, self, symbol)
 
     def hyperelliptic(self, h, f):
         return HC(self, h, f)

@@ -1,11 +1,11 @@
-from src.field_polynomial import FieldPolynomial
+from src.ring_polynomial import RingPolynomial
 from src.utils import gf_operation
 from src.integer import ZP
 
 
 class GF_Polynomial:
     def __init__(self, gf, coeff, symbol="a") -> None:
-        self._poly = FieldPolynomial(coeff, gf, symbol) % gf._poly
+        self._poly = RingPolynomial(coeff, gf, symbol) % gf._poly
         self.coeff = self._poly.coeff
         self.symbol = symbol
         self.gf = gf
