@@ -89,6 +89,11 @@ class Polynomial:
             s1, s0 = s0, s1 - q * s0
             t1, t0 = t0, t1 - q * t0
 
+        leading_coeff = self.coeff[0]
+        if leading_coeff != 1:
+            r1 = r1 / leading_coeff
+            s1 = s1 / leading_coeff
+            t1 = t1 / leading_coeff
         return r1, s1, t1
 
     def _from_coeff(self, coeff):
