@@ -125,3 +125,16 @@ def test_repr():
     assert repr(p1) == "a^4 + a^2"
     assert repr(gf.element([1])) == "1"
     assert repr(gf.element([0])) == "0"
+
+
+def test_sqrt():
+    gf = GaloisField(11)
+    gf = gf.extension(gf.poly([1, 1, 1]))
+
+    a = gf.element([1, 0])
+    b = a.sqrt()
+
+    assert b == gf.element([10, 10])
+    assert b**2 == a
+    assert (-b) ** 2 == a
+    assert gf.zero.sqrt() == gf.zero
