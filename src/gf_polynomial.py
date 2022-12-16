@@ -74,10 +74,7 @@ class GF_Polynomial:
         r = pow(self, (q + 1) // 2)
         m = s
 
-        while True:
-            if t == 1:
-                return r
-
+        while t != 1:
             # Find the least i such that t^2^i = 1
             i = 1
             while pow(t, pow(2, i)) != 1:
@@ -88,6 +85,7 @@ class GF_Polynomial:
             c = pow(b, 2)
             t = t * c
             r = r * b
+        return r
 
     def is_quadratic_residue(self):
         if self.legendre() == self.one() or self == self.zero():
