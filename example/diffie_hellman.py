@@ -2,14 +2,14 @@ import sys
 
 sys.path.insert(0, "..")
 
-from src.gf import GaloisField
+from src.finite_field import FiniteField
 
 if __name__ == "__main__":
     SMALL_PRIME = 884666614024826252892955729547
     MEDIUM_PRIME = 728332861387732709516448268243094614312200863702341084222463
     BIG_PRIME = 963438379803025380029290083247131353689695039066556841283773521973356839991301911935703108462287808104585159620942384189
 
-    gf = GaloisField(BIG_PRIME)
+    gf = FiniteField(BIG_PRIME)
     f = gf.poly([1, 0, 0, 0, 0, 17])
     h = gf.poly([0])
     c = gf.hyperelliptic(h, f)

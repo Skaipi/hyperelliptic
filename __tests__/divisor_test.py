@@ -1,8 +1,8 @@
-from src.gf import GaloisField
+from src.finite_field import FiniteField
 
 
 def test_constructor():
-    gf = GaloisField(5)
+    gf = FiniteField(5)
 
     f = gf.poly([1, 0, 3, 2, 0, 3])
     h = gf.poly([0])
@@ -34,7 +34,7 @@ def test_constructor():
 
 
 def test_points_from_divisor():
-    gf = GaloisField(5)
+    gf = FiniteField(5)
 
     f = gf.poly([1, 0, 3, 2, 0, 3])
     h = gf.poly([0])
@@ -52,7 +52,7 @@ def test_points_from_divisor():
 
 
 def test_random_divisors():
-    gf = GaloisField(5)
+    gf = FiniteField(5)
 
     f = gf.poly([1, 0, 3, 2, 0, 3])
     h = gf.poly([0])
@@ -63,7 +63,7 @@ def test_random_divisors():
 
 
 def test_addition():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     f = gf.poly([1, 0, 3, 7, 1, 2])
     h = gf.poly([0])

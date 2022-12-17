@@ -1,48 +1,29 @@
 from src.ring_polynomial import RingPolynomial
-from src.utils import gf_operation
-from src.integer import ZP
+from src.polynomial import Polynomial
 
 
-class GF_Polynomial:
-    def __init__(self, gf, coeff, symbol="a") -> None:
-        self._poly = RingPolynomial(coeff, gf, symbol) % gf._poly
-        self.coeff = self._poly.coeff
-        self.symbol = symbol
-        self.gf = gf
+class GF_Polynomial(Polynomial):
+    def __init__(self, field, coeff, symbol="a"):
+        super().__init__(coeff, symbol)
+        self.gf = field
 
-    @property
-    def deg(self) -> int:
-        return len(self.coeff) - 1
+        if self.deg >= field._poly.deg:
+            self.coeff = (self % field._poly).coeff
 
-    def zero(self):
-        coeff = [self.coeff[0].zero()]
-        return GF_Polynomial(self.gf, coeff, self.symbol)
+    def coeff_zero(self):
+        return self.gf.base.zero()
 
-    def one(self):
-        coeff = [self.coeff[0].one()]
-        return GF_Polynomial(self.gf, coeff, self.symbol)
-
-    def xgcd(self, other):
-        return self._poly.xgcd(other._poly)
-
-    def to_monic(self):
-        return self._from_zp_polynomial(self._poly.to_monic())
-
-    def to_int(self):
-        result = 0
-        for i, c in enumerate(self.coeff[::-1]):
-            result += c * self.gf.p**i
-        return result
+    def coeff_one(self):
+        return self.gf.base.one()
 
     def inverse(self):
         if self == self.zero():
             raise ZeroDivisionError("Element 0 has no inverse")
 
-        d, a, b = self.xgcd(self.gf)
+        d, a, b = self.xgcd(self.gf._poly)
         if not d.isConst():
             raise Exception("Element has no inverse!")
-
-        return self._from_zp_polynomial(a / d.toInt())
+        return a
 
     def sqrt(self):
         # Tonelli-Shanks algorithm
@@ -88,91 +69,15 @@ class GF_Polynomial:
         return r
 
     def is_quadratic_residue(self):
-        if self.legendre() == self.one() or self == self.zero():
-            return True
-        return False
+        return self.legendre() == self.one() or self == self.zero()
 
     def legendre(self):
         return pow(self, ((self.gf.q - 1) // 2))
 
-    def _from_zp_polynomial(self, poly):
-        return GF_Polynomial(self.gf, poly.coeff, poly.symbol)
+    def _from_coeff(self, coeff):
+        return GF_Polynomial(self.gf, coeff, self.symbol)
 
-    @gf_operation
-    def __add__(self, other):
-        if isinstance(other, ZP) or isinstance(other, int):
-            return self._from_zp_polynomial(self._poly + other)
-        result = self._poly + other._poly
-        return self._from_zp_polynomial(result)
-
-    @gf_operation
-    def __radd__(self, other):
-        return self.__add__(other)
-
-    @gf_operation
-    def __sub__(self, other):
-        if isinstance(other, ZP) or isinstance(other, int):
-            return self._from_zp_polynomial(self._poly - other)
-        result = self._poly - other._poly
-        return self._from_zp_polynomial(result)
-
-    @gf_operation
-    def __mul__(self, other):
-        if isinstance(other, int) or isinstance(other, ZP):
-            return self._from_zp_polynomial(self._poly * other)
-        result = self._poly * other._poly
-        return self._from_zp_polynomial(result)
-
-    @gf_operation
-    def __rmul__(self, other):
-        return self.__mul__(other)
-
-    @gf_operation
-    def __pow__(self, other):
-        result = pow(self._poly, other, self.gf._poly)
-        return self._from_zp_polynomial(result)
-
-    @gf_operation
-    def __divmod__(self, other):
-        r1, r2 = divmod(self._poly, other._poly)
-        return self._from_zp_polynomial(r1), self._from_zp_polynomial(r2)
-
-    @gf_operation
     def __truediv__(self, other):
-        if isinstance(other, ZP) or isinstance(other, int):
-            return self._from_zp_polynomial(self._poly / other)
-        return self._from_zp_polynomial(self._poly * other.inverse())
-
-    @gf_operation
-    def __mod__(self, other):
-        return divmod(self, other)[1]
-
-    @gf_operation
-    def __floordiv__(self, other):
-        return divmod(self, other)[0]
-
-    @gf_operation
-    def __eq__(self, other):
-        if isinstance(other, ZP) or isinstance(other, int):
-            return self._poly == other
         if isinstance(other, GF_Polynomial):
-            return self._poly == other._poly
-        return False
-
-    def __neg__(self):
-        return self._from_zp_polynomial(-self._poly)
-
-    def __call__(self, x):
-        result = self.gf.int_zero
-        for i, c in enumerate(self.coeff[::-1]):
-            result += x**i * c
-        return result
-
-    def __str__(self):
-        return str(self._poly)
-
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return self.to_int().value
+            return self * other.inverse()
+        return super().__truediv__(other)

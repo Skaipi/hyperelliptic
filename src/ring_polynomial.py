@@ -1,24 +1,20 @@
+from src.utils import factors
 from src.polynomial import Polynomial
 
 
 class RingPolynomial(Polynomial):
-    def __init__(self, coeff, field=None, symbol="x"):
+    def __init__(self, field, coeff, symbol="x"):
         super().__init__(coeff, symbol)
         self.gf = field
 
     def coeff_zero(self):
-        return self.gf.int_zero
+        return self.gf.zero()
 
     def coeff_one(self):
-        return self.gf.int_one
+        return self.gf.one()
 
     # https://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
     def factors(self):
-        if self.gf == None:
-            raise ValueError(
-                "Polynomial must be defined over finite field to be factored"
-            )
-
         factors = []
         sf_factors = self.square_free_factors()
 
@@ -60,7 +56,7 @@ class RingPolynomial(Polynomial):
         gf = self.gf
         factors = []
         poly = self._from_coeff(self.coeff)
-        x = self._from_coeff([gf(1), gf(0)])
+        x = self._from_coeff([self.coeff_one(), self.coeff_zero()])
 
         i = 1
         while i <= self.deg // 2:
@@ -100,15 +96,10 @@ class RingPolynomial(Polynomial):
 
     def is_irreducible(self):
         # Rabin test of irreducibility
-        if self.gf == None:
-            raise ValueError(
-                "Polynomial must be defined over finite field to check irreducibility"
-            )
-
         gf = self.gf
-        deg_factors = self.gf.factors(self.deg)
+        deg_factors = factors(self.deg)
         quotients = set([self.deg // factor for factor in deg_factors])
-        x = self._from_coeff([gf(1), gf(0)])
+        x = self._from_coeff([self.coeff_one(), self.coeff_zero()])
 
         prev_h = x
         prev_q = 0
@@ -126,4 +117,4 @@ class RingPolynomial(Polynomial):
         return False
 
     def _from_coeff(self, coeff):
-        return RingPolynomial(coeff, self.gf, self.symbol)
+        return RingPolynomial(self.gf, coeff, self.symbol)

@@ -1,18 +1,18 @@
 import pytest
-from src.gf import GaloisField
+from src.finite_field import FiniteField
 
 
 def test_constructors():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
-    assert gf.poly_zero == gf.poly([0]) and gf.poly_zero.deg == 0
-    assert gf.poly_one == gf.poly([1]) and gf.poly_one.deg == 0
+    assert gf.poly([gf.zero()]) == gf.poly([0]) and gf.poly([gf.zero()]).deg == 0
+    assert gf.poly([gf.one()]) == gf.poly([1]) and gf.poly([gf.one()]).deg == 0
     assert gf.poly([1, 0, 0, 4]) == gf.poly([0, 0, 1, 0, 0, 4])
     assert gf.poly([3, 0, 1, 0, 2, 2]).deg == 5
 
 
 def test_addition():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 0, 1, 8, 9, 7])
     p2 = gf.poly([1, 0, 3, 4])
@@ -20,18 +20,18 @@ def test_addition():
 
 
 def test_substraction():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 0, 1, 8, 9, 7])
     p2 = gf.poly([1, 0, 3, 4])
     assert p2 - p1 == gf.poly([10, 0, 0, 3, 5, 8])
     assert p1 - p2 == gf.poly([1, 0, 0, 8, 6, 3])
-    assert p1 - gf.poly_zero == p1
-    assert p2 - gf.poly_zero == p2
+    assert p1 - gf.poly([gf.zero()]) == p1
+    assert p2 - gf.poly([gf.zero()]) == p2
 
 
 def test_multiplication():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 0, 1, 8, 9, 7])
     p2 = gf.poly([1, 0, 3, 4])
@@ -41,19 +41,19 @@ def test_multiplication():
     assert p2 * p1 == gf.poly([1, 0, 4, 1, 1, 2, 4, 2, 6])
     assert p3 * p4 == gf.poly([7, 9, 4, 2])
 
-    assert p1 * gf.poly_one == p1
-    assert p2 * gf.poly_one == p2
-    assert p3 * gf.poly_one == p3
-    assert p4 * gf.poly_one == p4
+    assert p1 * gf.poly([gf.one()]) == p1
+    assert p2 * gf.poly([gf.one()]) == p2
+    assert p3 * gf.poly([gf.one()]) == p3
+    assert p4 * gf.poly([gf.one()]) == p4
 
-    assert p1 * gf.poly_zero == gf.poly_zero
-    assert p2 * gf.poly_zero == gf.poly_zero
-    assert p3 * gf.poly_zero == gf.poly_zero
-    assert p4 * gf.poly_zero == gf.poly_zero
+    assert p1 * gf.poly([gf.zero()]) == gf.poly([gf.zero()])
+    assert p2 * gf.poly([gf.zero()]) == gf.poly([gf.zero()])
+    assert p3 * gf.poly([gf.zero()]) == gf.poly([gf.zero()])
+    assert p4 * gf.poly([gf.zero()]) == gf.poly([gf.zero()])
 
 
 def test_division():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 4, 2, 8, 1, 4])
     p2 = gf.poly([1, 4, 1, 4])
@@ -69,79 +69,57 @@ def test_division():
     assert p3 // p4 == gf.poly([1, 0, 9])
     assert p3 % p4 == gf.poly([4, 4, 4])
 
-    assert p3 // gf.poly_one == p3
-    assert p4 // gf.poly_one == p4
-    assert p5 // gf.poly_one == p5
-    assert p6 // gf.poly_one == p6
+    assert p3 // gf.poly([gf.one()]) == p3
+    assert p4 // gf.poly([gf.one()]) == p4
+    assert p5 // gf.poly([gf.one()]) == p5
+    assert p6 // gf.poly([gf.one()]) == p6
 
     with pytest.raises(ZeroDivisionError):
-        p3 // gf.poly_zero
+        p3 // gf.poly([gf.zero()])
 
     with pytest.raises(ZeroDivisionError):
-        p3 % gf.poly_zero
+        p3 % gf.poly([gf.zero()])
 
 
 def test_comparison():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 0, 10])
-    assert gf.poly_zero == 0
-    assert gf.poly_one == 1
+    assert gf.poly([gf.zero()]) == 0
+    assert gf.poly([gf.one()]) == 1
     assert p1 != 10
 
 
 def test_exponentiation():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 0, 1])
     assert p1**2 == gf.poly([1, 0, 2, 0, 1])
     assert p1**3 == gf.poly([1, 0, 3, 0, 3, 0, 1])
     assert p1 * p1 * p1 * p1 == p1**4
-    assert p1**0 == gf.poly_one
+    assert p1**0 == gf.poly([gf.one()])
 
 
 def test_to_string():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
-    assert str(gf.poly_one) == "1"
-    assert str(gf.poly_zero) == "0"
+    assert str(gf.poly([gf.one()])) == "1"
+    assert str(gf.poly([gf.zero()])) == "0"
     assert str(gf.poly([1, 0, 3, 1, 1])) == "x^4 + 3x^2 + x + 1"
     assert str(gf.poly([1, 0, 3, 1, 0])) == "x^4 + 3x^2 + x"
-    assert (
-        str(
-            gf.poly(
-                [gf.poly([1, 0, 3, 1, 1]), gf.poly([1, 0, 3, 1, 0]), gf.poly([0])], "y"
-            )
-        )
-        == "(x^4 + 3x^2 + x + 1)y^2 + (x^4 + 3x^2 + x)y"
-    )
-    assert (
-        str(
-            gf.poly(
-                [
-                    gf.poly([1]),
-                    gf.poly([1, 0, 3, 1, 1]),
-                    gf.poly([1, 0, 3, 1, 0]),
-                    gf.poly([0]),
-                ],
-                "y",
-            )
-        )
-        == "y^3 + (x^4 + 3x^2 + x + 1)y^2 + (x^4 + 3x^2 + x)y"
-    )
 
 
 def test_repr():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
-    assert repr(gf.poly_one) == "1"
-    assert repr(gf.poly_zero) == "0"
+    assert repr(gf.poly([gf.one()])) == "1"
+    assert repr(gf.poly([gf.zero()])) == "0"
     assert repr(gf.poly([1, 0, 3, 1, 1])) == "x^4 + 3x^2 + x + 1"
     assert repr(gf.poly([1, 0, 3, 1, 0])) == "x^4 + 3x^2 + x"
 
 
 def test_derivative():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 0, 1, 8, 9, 7])
     p2 = gf.poly([1, 0, 3, 4])
@@ -153,11 +131,11 @@ def test_derivative():
     assert p2.derivative() == gf.poly([3, 0, 3])
     assert p3.derivative() == gf.poly([2, 0])
     assert p4.derivative() == gf.poly([7])
-    assert p5.derivative() == gf.poly_zero
+    assert p5.derivative() == gf.poly([gf.zero()])
 
 
 def test_gcd():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 7, 6])
     p2 = gf.poly([1, 6, 5])
@@ -170,7 +148,7 @@ def test_gcd():
 
 
 def test_factorization():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     p1 = gf.poly([1, 0, 1])
     p2 = gf.poly([1, 4])
@@ -193,7 +171,7 @@ def test_factorization():
 
 
 def test_irreducibility():
-    gf = GaloisField(2)
+    gf = FiniteField(2)
 
     poly = gf.poly([1, 0, 0, 0, 1, 1, 1, 0, 1])
     assert poly.is_irreducible() == True
@@ -204,6 +182,6 @@ def test_irreducibility():
     poly = gf.poly([1, 0, 1, 0, 1, 0, 0, 0])
     assert poly.is_irreducible() == False
 
-    gf = GaloisField(7)
+    gf = FiniteField(7)
     poly = gf.poly([1, 6, 1, 3, 0, 6, 5])
     assert poly.is_irreducible() == False

@@ -72,7 +72,7 @@ class HC:
         discriminant = hx * hx + 4 * fx
         if not discriminant.is_quadratic_residue():
             return None
-        y1 = (-hx + self.gf.sqrt(discriminant)) / self.gf(2)
+        y1 = (-hx + discriminant.sqrt()) / self.gf(2)
         y2 = -y1 - hx
         y = y1 if randint(0, 1) == 0 else y2
         return (x, y)
@@ -105,7 +105,7 @@ class Divisor:
         # Find first polynomial of Mumford representation
         valid_points = list(filter(lambda p: p != INF_POINT, points))
         gf = curve.gf
-        u = gf.poly_one
+        u = gf.poly([gf.one()])
         for x in curve._x_from_points(valid_points):
             u *= gf.poly([gf(1), -x])
 
@@ -114,9 +114,9 @@ class Divisor:
         p_y = curve._y_from_points(valid_unique_points)
 
         # Find second polynomial via Lagrange interpolation
-        v = gf.poly_zero
+        v = gf.poly([gf.zero()])
         for i in range(len(p_y)):
-            tmp = gf.poly_one
+            tmp = gf.poly([gf.one()])
             for j in range(len(p_x)):
                 if j == i:
                     continue
@@ -127,7 +127,9 @@ class Divisor:
 
     @classmethod
     def zero(cls, curve):
-        return Divisor(curve, curve.gf.poly_one, curve.gf.poly_zero)
+        return Divisor(
+            curve, curve.gf.poly([curve.gf.one()]), curve.gf.poly([curve.gf.zero()])
+        )
 
     @property
     def points(self):
