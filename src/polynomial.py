@@ -27,13 +27,13 @@ def same_type_coeff(function):
 
 
 class Polynomial:
-    def __init__(self, coeff, symbol="x") -> None:
+    def __init__(self, coeff, symbol="x"):
         self.coeff = self._strip(coeff)
         self.symbol = symbol
         self._has_int_coeff = is_int_like(self.coeff[0])
 
     @property
-    def deg(self) -> int:
+    def deg(self):
         return len(self.coeff) - 1
 
     def zero(self):
@@ -216,13 +216,13 @@ class Polynomial:
             return all(a == b for a, b in zip(self.coeff, other.coeff))
         return False
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return str(self)
 
     def __call__(self, x):
         return sum([x**i * c for i, c in enumerate(self.coeff[::-1])])
 
-    def __str__(self) -> str:
+    def __str__(self):
         if all(x == 0 for x in self.coeff):
             return "0"
 

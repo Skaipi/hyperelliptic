@@ -14,32 +14,32 @@ class FiniteField:
 
         self.p = p
 
-    def zero(self) -> ZP:
+    def zero(self):
         return ZP(self, 0)
 
-    def one(self) -> ZP:
+    def one(self):
         return ZP(self, 1)
 
-    def element(self, value) -> ZP:
+    def element(self, value):
         return ZP(self, value)
 
     def get_elements(self):
         return range(0, self.p)
 
-    def poly(self, coeff, symbol="x") -> RingPolynomial:
+    def poly(self, coeff, symbol="x"):
         parsed_coeff = self._parse_coeff(coeff)
         return RingPolynomial(self, parsed_coeff, symbol)
 
-    def extension(self, polynomial) -> GaloisField:
+    def extension(self, polynomial):
         return GaloisField(self, polynomial)
 
-    def rand_element(self) -> ZP:
+    def rand_element(self):
         return self.element(randint(0, self.p - 1))
 
-    def rand_poly(self, deg) -> RingPolynomial:
+    def rand_poly(self, deg):
         return self.poly([self.rand_element() for _ in range(deg + 1)])
 
-    def rand_irreducible_poly(self, deg) -> RingPolynomial:
+    def rand_irreducible_poly(self, deg):
         leading_coeff = self.one()
         poly = self.poly([leading_coeff] + [self.rand_element() for _ in range(deg)])
         while not poly.is_irreducible():
@@ -48,24 +48,24 @@ class FiniteField:
             )
         return poly
 
-    def hyperelliptic(self, h, f) -> HC:
+    def hyperelliptic(self, h, f):
         return HC(self, h, f)
 
-    def _is_field_element(self, value) -> bool:
+    def _is_field_element(self, value):
         return isinstance(value, ZP) and value.gf == self
 
-    def _parse_coeff(self, coeff) -> list[ZP]:
+    def _parse_coeff(self, coeff):
         return list(
             map(lambda x: x if self._is_field_element(x) else self.element(x), coeff)
         )
 
-    def __call__(self, value) -> ZP:
+    def __call__(self, value):
         if isinstance(value, int):
             return self.element(value)
         raise ValueError(f"Invalid value for {self} element")
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other):
         return self.p == other.p
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"Finite Field mod {self.p}"
