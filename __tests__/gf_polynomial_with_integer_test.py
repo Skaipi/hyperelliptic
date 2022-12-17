@@ -1,9 +1,9 @@
 import pytest
-from src.gf import GaloisField
+from src.finite_field import FiniteField
 
 
 def test_addition():
-    gf = GaloisField(2)
+    gf = FiniteField(2)
     poly = gf.poly([1, 0, 0, 1, 0, 1])
     gf = gf.extension(poly)
 
@@ -17,7 +17,7 @@ def test_addition():
 
 
 def test_substraction():
-    gf = GaloisField(2)
+    gf = FiniteField(2)
     poly = gf.poly([1, 0, 0, 1, 0, 1])
     gf = gf.extension(poly)
 
@@ -31,7 +31,7 @@ def test_substraction():
 
 
 def test_multiplication():
-    gf = GaloisField(2)
+    gf = FiniteField(2)
     poly = gf.poly([1, 0, 0, 1, 0, 1])
     gf = gf.extension(poly)
 
@@ -39,13 +39,13 @@ def test_multiplication():
     o = gf(1)
     z = gf(0)
     assert p * o == p
-    assert p * z == gf.zero
+    assert p * z == gf.zero()
     assert o * p == p
-    assert z * p == gf.zero
+    assert z * p == gf.zero()
 
 
 def test_division():
-    gf = GaloisField(2)
+    gf = FiniteField(2)
     poly = gf.poly([1, 0, 0, 1, 0, 1])
     gf = gf.extension(poly)
 

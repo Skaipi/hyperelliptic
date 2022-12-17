@@ -79,7 +79,7 @@ class Polynomial:
 
     @same_type_coeff
     def xgcd(self, other):
-        r1, r0 = self, other
+        r1, r0 = self._copy(), other._copy()
         s1, s0 = self.one(), self.zero()
         t1, t0 = self.zero(), self.one()
 
@@ -94,6 +94,7 @@ class Polynomial:
             r1 = r1 / leading_coeff
             s1 = s1 / leading_coeff
             t1 = t1 / leading_coeff
+
         return r1, s1, t1
 
     def _from_coeff(self, coeff):
@@ -128,6 +129,10 @@ class Polynomial:
     @same_type_coeff
     def __sub__(self, other):
         return self + (-other)
+
+    @same_type_coeff
+    def __rsub__(self, other):
+        return -self + other
 
     @same_type_coeff
     def __mul__(self, other):
@@ -176,16 +181,20 @@ class Polynomial:
             return self / other.toInt(), self.zero()
 
         coeff_zero = self.coeff_zero()
-        remainder = self._from_coeff(self.coeff)
-        quotient = self.zero()
+        coeff_one = self.coeff_one()
+        remainder = self._copy()
+        quotient = Polynomial([coeff_zero])
 
         while remainder != self.zero() and other.deg <= remainder.deg:
             t = remainder.coeff[0] / other.coeff[0]
-            m = self._from_coeff([1] + [coeff_zero] * (remainder.deg - other.deg))
+            m = Polynomial([coeff_one] + [coeff_zero] * (remainder.deg - other.deg))
             quotient = quotient + t * m
             remainder = remainder - t * other * m
 
-        return quotient, remainder
+        return self._from_coeff(quotient.coeff), self._from_coeff(remainder.coeff)
+
+    def _copy(self):
+        return Polynomial(self.coeff)
 
     @same_type_coeff
     def __mod__(self, other):

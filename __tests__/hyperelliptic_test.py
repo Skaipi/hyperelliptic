@@ -1,9 +1,9 @@
 import pytest
-from src.gf import GaloisField
+from src.finite_field import FiniteField
 
 
 def test_constructor():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     f = gf.poly([2, 0, 3, 7, 1, 2])
     h = gf.poly([0])
@@ -27,7 +27,7 @@ def test_constructor():
 
 
 def test_points_on_curve():
-    gf = GaloisField(11)
+    gf = FiniteField(11)
 
     f = gf.poly([1, 0, 3, 7, 1, 2])
     h = gf.poly([0])
@@ -55,7 +55,7 @@ def test_points_on_curve():
     assert all([p in expected_points for p in points]) == True
     assert len(points) == len(expected_points)
 
-    gf = GaloisField(5)
+    gf = FiniteField(5)
 
     f = gf.poly([1, 0, 3, 7, 1, 2])
     h = gf.poly([0])
@@ -69,7 +69,7 @@ def test_points_on_curve():
 
 
 def test_non_zero_divisors_on_curve():
-    gf = GaloisField(5)
+    gf = FiniteField(5)
 
     f = gf.poly([1, 0, 3, 7, 1, 2])
     h = gf.poly([0])

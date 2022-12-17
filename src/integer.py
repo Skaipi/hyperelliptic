@@ -134,7 +134,7 @@ class ZP:
         return self.__mul__(other)
 
     @gf_operation
-    def __div__(self, other):
+    def __truediv__(self, other):
         if isinstance(other, int):
             return self._from_value(
                 self.value * self._from_value(other).inverse().value
@@ -142,8 +142,8 @@ class ZP:
         return self._from_value(self.value * other.inverse().value)
 
     @gf_operation
-    def __truediv__(self, other):
-        return self.__div__(other)
+    def __rtruediv__(self, other):
+        return self.inverse() * other
 
     @gf_operation
     def __divmod__(self, other):
