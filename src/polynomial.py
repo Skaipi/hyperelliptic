@@ -127,6 +127,10 @@ class Polynomial:
         return self._from_coeff(result)
 
     @same_type_coeff
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    @same_type_coeff
     def __sub__(self, other):
         return self + (-other)
 

@@ -66,7 +66,7 @@ class HC:
         return list(map(lambda p: p[1], points))
 
     def _point_from_x(self, x):
-        # NOTE: This formula works for fields of characteristic != 2 (regular quadratic equation solution might not work)
+        # NOTE: This formula works only for fields of characteristic != 2
         hx = self.h(x)
         fx = self.f(x)
         discriminant = hx * hx + 4 * fx
