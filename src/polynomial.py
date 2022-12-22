@@ -15,7 +15,7 @@ def same_type_coeff(function):
         if is_number_like(poly_a) or is_number_like(poly_b):
             return function(poly_a, poly_b)
 
-        ca, cb = poly_a.coeff[0], poly_b.coeff[0]
+        ca, cb = poly_a.leading_coeff, poly_b.leading_coeff
         is_int_type = is_int_like(ca) or is_int_like(cb)
         if not is_int_type and type(ca) != type(cb):
             raise ValueError(
@@ -30,11 +30,15 @@ class Polynomial:
     def __init__(self, coeff, symbol="x"):
         self.coeff = self._strip(coeff)
         self.symbol = symbol
-        self._has_int_coeff = is_int_like(self.coeff[0])
+        self._has_int_coeff = is_int_like(self.leading_coeff)
 
     @property
     def deg(self):
         return len(self.coeff) - 1
+
+    @property
+    def leading_coeff(self):
+        return self.coeff[0]
 
     def zero(self):
         return self._from_coeff([self.coeff_zero()])
@@ -42,17 +46,17 @@ class Polynomial:
     def one(self):
         return self._from_coeff([self.coeff_one()])
 
-    def to_monic(self):
-        c = self.coeff[0]
-        if c != 1:
-            return self / c
-        return self
-
     def coeff_zero(self):
         return 0
 
     def coeff_one(self):
         return 1
+
+    def to_monic(self):
+        c = self.leading_coeff
+        if c != 1:
+            return self / c
+        return self
 
     def isConst(self):
         return self.deg <= 0
@@ -60,13 +64,12 @@ class Polynomial:
     def toInt(self):
         if not self.isConst():
             raise Exception(f"Can not cast {self} to integer")
-        return self.coeff[0]
+        return self.leading_coeff
 
     def derivative(self):
-        l = len(self.coeff[:-1])
-        if l == 0:
+        if self.deg == 0:
             return self.zero()
-        coeff = [c * (l - i) for i, c in enumerate(self.coeff[:-1])]
+        coeff = [c * (self.deg - i) for i, c in enumerate(self.coeff[:-1])]
         return self._from_coeff(coeff)
 
     @same_type_coeff
@@ -89,7 +92,7 @@ class Polynomial:
             s1, s0 = s0, s1 - q * s0
             t1, t0 = t0, t1 - q * t0
 
-        leading_coeff = r1.coeff[0]
+        leading_coeff = r1.leading_coeff
         if leading_coeff != 1:
             r1 = r1 / leading_coeff
             s1 = s1 / leading_coeff
@@ -97,16 +100,15 @@ class Polynomial:
 
         return r1, s1, t1
 
+    def _copy(self):
+        return Polynomial(self.coeff)
+
     def _from_coeff(self, coeff):
         return Polynomial(coeff, self.symbol)
 
-    def _strip(self, arr):
-        index = -1
-        for i in range(len(arr)):
-            if arr[i] != 0:
-                index = i
-                break
-        return arr[index:]
+    def _strip(self, coeff):
+        element = next(filter(lambda x: x != 0, coeff), None)
+        return [0] if element is None else coeff[coeff.index(element) :]
 
     @same_type_coeff
     def __add__(self, other):
@@ -115,15 +117,12 @@ class Polynomial:
             coeff[-1] = coeff[-1] + other
             return self._from_coeff(coeff)
 
-        result = []
         zero_coeff = self.coeff_zero()
         size = max(self.deg, other.deg)
         s_coeff = [zero_coeff] * (size - self.deg) + self.coeff
         o_coeff = [zero_coeff] * (size - other.deg) + other.coeff
 
-        for i in range(size + 1):
-            coeff = s_coeff[i] + o_coeff[i]
-            result.append(coeff)
+        result = list(map(lambda s, o: s + o, s_coeff, o_coeff))
         return self._from_coeff(result)
 
     @same_type_coeff
@@ -153,6 +152,40 @@ class Polynomial:
     def __rmul__(self, other):
         return self.__mul__(other)
 
+    @same_type_coeff
+    def __truediv__(self, other):
+        if isinstance(other, self.leading_coeff.__class__) or is_int_like(other):
+            return self._from_coeff(list(map(lambda x: x / other, self.coeff)))
+        return NotImplemented
+
+    @same_type_coeff
+    def __divmod__(self, other):
+        if self.deg < other.deg:
+            return self.zero(), self
+        if other.isConst():
+            return self / other.toInt(), self.zero()
+
+        zero = self.coeff_zero()
+        one = self.coeff_one()
+        remainder = self._copy()
+        quotient = Polynomial([zero])
+
+        while remainder != self.zero() and other.deg <= remainder.deg:
+            t = remainder.leading_coeff / other.leading_coeff
+            m = Polynomial([one] + [zero] * (remainder.deg - other.deg))
+            quotient = quotient + t * m
+            remainder = remainder - t * other * m
+
+        return self._from_coeff(quotient.coeff), self._from_coeff(remainder.coeff)
+
+    @same_type_coeff
+    def __mod__(self, other):
+        return divmod(self, other)[1]
+
+    @same_type_coeff
+    def __floordiv__(self, other):
+        return divmod(self, other)[0]
+
     def __pow__(self, other, mod=None):
         if not is_int_like(other):
             raise NotImplementedError(f"Polynomial exp error (exp = {exp})")
@@ -172,48 +205,12 @@ class Polynomial:
             exp = exp // 2
         return result
 
-    def __truediv__(self, other):
-        if isinstance(other, self.coeff[0].__class__) or is_int_like(other):
-            return self._from_coeff(list(map(lambda x: x / other, self.coeff)))
-        return NotImplemented
-
-    @same_type_coeff
-    def __divmod__(self, other):
-        if self.deg < other.deg:
-            return self.zero(), self
-        if other.isConst():
-            return self / other.toInt(), self.zero()
-
-        coeff_zero = self.coeff_zero()
-        coeff_one = self.coeff_one()
-        remainder = self._copy()
-        quotient = Polynomial([coeff_zero])
-
-        while remainder != self.zero() and other.deg <= remainder.deg:
-            t = remainder.coeff[0] / other.coeff[0]
-            m = Polynomial([coeff_one] + [coeff_zero] * (remainder.deg - other.deg))
-            quotient = quotient + t * m
-            remainder = remainder - t * other * m
-
-        return self._from_coeff(quotient.coeff), self._from_coeff(remainder.coeff)
-
-    def _copy(self):
-        return Polynomial(self.coeff)
-
-    @same_type_coeff
-    def __mod__(self, other):
-        return divmod(self, other)[1]
-
-    @same_type_coeff
-    def __floordiv__(self, other):
-        return divmod(self, other)[0]
-
     def __neg__(self):
         return self._from_coeff(list(map(lambda x: -x, self.coeff)))
 
     def __eq__(self, other):
         if isinstance(other, int):
-            return len(self.coeff) == 1 and self.coeff[0] == other
+            return len(self.coeff) == 1 and self.leading_coeff == other
         if isinstance(other, Polynomial):
             if self.deg != other.deg:
                 return False
