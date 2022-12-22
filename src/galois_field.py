@@ -32,7 +32,7 @@ class GaloisField:
         a = self.element([1, 0])
         result = a**0
 
-        for _ in range(self.q):
+        for _ in range(self.q - 1):
             yield result
             result = result * a
 
