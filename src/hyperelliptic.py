@@ -83,8 +83,11 @@ class HC:
             point = self._point_from_x(x)
             if point == None:
                 continue
+
+            inverse = self.point_inverse(point)
             result.append(point)
-            result.append(self.point_inverse(point))
+            if point != inverse:
+                result.append(inverse)
         return result
 
     def __str__(self):

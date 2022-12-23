@@ -93,7 +93,7 @@ class Polynomial:
             t1, t0 = t0, t1 - q * t0
 
         leading_coeff = r1.leading_coeff
-        if leading_coeff != 1:
+        if leading_coeff != self.one():
             r1 = r1 / leading_coeff
             s1 = s1 / leading_coeff
             t1 = t1 / leading_coeff
@@ -108,7 +108,7 @@ class Polynomial:
 
     def _strip(self, coeff):
         element = next(filter(lambda x: x != 0, coeff), None)
-        return [0] if element is None else coeff[coeff.index(element) :]
+        return [self.coeff_zero()] if element is None else coeff[coeff.index(element) :]
 
     @same_type_coeff
     def __add__(self, other):
@@ -221,7 +221,9 @@ class Polynomial:
         return str(self)
 
     def __call__(self, x):
-        return sum([x**i * c for i, c in enumerate(self.coeff[::-1])])
+        return sum(
+            [x**i * c for i, c in enumerate(self.coeff[::-1])], self.coeff_zero()
+        )
 
     def __str__(self):
         if all(x == 0 for x in self.coeff):
