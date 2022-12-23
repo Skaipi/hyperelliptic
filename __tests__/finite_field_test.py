@@ -25,8 +25,8 @@ def test_different_gf():
     with pytest.raises(ValueError):
         a + b
 
-    assert a + c == FiniteField(11)(1)
-    assert b + d == FiniteField(23)(12)
+    assert a + c == FiniteField(11).element(1)
+    assert b + d == FiniteField(23).element(12)
 
 
 def test_random_irreducible_poly():
@@ -35,3 +35,9 @@ def test_random_irreducible_poly():
     for i in range(2, 5):
         p = gf.rand_irreducible_poly(i)
         assert p.is_irreducible()
+
+
+def test_to_string():
+    gf = FiniteField(11)
+
+    assert str(gf) == "Finite Field mod 11"

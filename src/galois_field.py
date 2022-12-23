@@ -1,6 +1,7 @@
 from src.ring_polynomial import RingPolynomial
 from src.gf_polynomial import GF_Polynomial
 from src.hyperelliptic import HC
+from src.integer import ZP
 
 
 class GaloisField:
@@ -23,6 +24,8 @@ class GaloisField:
         return GF_Polynomial(self, [self.base.one()])
 
     def element(self, value):
+        if isinstance(value, int) or isinstance(value, ZP):
+            value = [value]
         if not isinstance(value, list):
             raise ValueError(f"{self} element must be defined by list object")
         parsed_coeff = self.base._parse_coeff(value)

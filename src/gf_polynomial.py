@@ -4,8 +4,8 @@ from src.polynomial import Polynomial
 
 class GF_Polynomial(Polynomial):
     def __init__(self, field, coeff, symbol="a"):
-        super().__init__(coeff, symbol)
         self.gf = field
+        super().__init__(coeff, symbol)
 
         if self.deg >= field._poly.deg:
             self.coeff = (self % field._poly).coeff
@@ -81,3 +81,9 @@ class GF_Polynomial(Polynomial):
         if isinstance(other, GF_Polynomial):
             return self * other.inverse()
         return super().__truediv__(other)
+
+    def __hash__(self):
+        result = 0
+        for i, c in enumerate(self.coeff[::-1]):
+            result += c.value * self.gf.p**i
+        return result

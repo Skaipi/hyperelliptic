@@ -38,7 +38,6 @@ def test_points_on_curve():
         (1, 6),
         (1, 5),
         (2, 0),
-        (2, 0),
         (4, 6),
         (4, 5),
         (6, 7),
@@ -66,6 +65,20 @@ def test_points_on_curve():
 
     assert all([p in expected_points for p in points]) == True
     assert len(points) == len(expected_points)
+
+
+def test_points_on_curve_over_gf():
+    gf = FiniteField(11)
+    poly = gf.poly([1, 3, 3])
+    gf = gf.extension(poly)
+
+    f = gf.poly([1, 0, 3, 7, 1, 2])
+    h = gf.poly([0])
+
+    c = gf.hyperelliptic(h, f)
+    points = c.get_all_points()
+
+    assert len(points) == 147
 
 
 def test_non_zero_divisors_on_curve():

@@ -4,8 +4,8 @@ from src.polynomial import Polynomial
 
 class RingPolynomial(Polynomial):
     def __init__(self, field, coeff, symbol="x"):
-        super().__init__(coeff, symbol)
         self.gf = field
+        super().__init__(coeff, symbol)
 
     def coeff_zero(self):
         return self.gf.zero()
