@@ -1,10 +1,10 @@
-from src.utils import is_prime, factors
+from random import randint
+
+from src.utils import is_prime
 from src.galois_field import GaloisField
 from src.ring_polynomial import RingPolynomial
 from src.hyperelliptic import HC
 from src.integer import ZP
-
-from random import randint
 
 
 class FiniteField:

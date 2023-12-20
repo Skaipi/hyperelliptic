@@ -162,14 +162,19 @@ class ZP:
         return divmod(self, other)[0]
 
     def __pow__(self, other, mod=None):
+        if isinstance(other, ZP):
+            return self._pow(other.value, mod)
         if isinstance(other, int):
-            if mod != None:
-                return self._from_value(pow(self.value, other, mod))
-            return self._from_value(pow(self.value, other, self.p))
+            return self._pow(other, mod)
         raise ValueError("Exponent must be an integer")
 
     def __neg__(self):
         return self._from_value(-self.value)
+
+    def _pow(self, other, mod=None):
+        if mod is not None:
+            return self._from_value(pow(self.value, other, mod))
+        return self._from_value(pow(self.value, other, self.p))
 
     @gf_operation
     def __gt__(self, other):

@@ -85,8 +85,12 @@ def test_exponentiation():
     assert gf(2) ** 2 == 4
     assert gf(7) ** 11 == 7
 
-    with pytest.raises(ValueError):
-        gf(2) ** gf(7)
+
+def test_exponentiation_with_other_element():
+    gf = FiniteField(11)
+
+    assert gf(2) ** gf(2) == 4
+    assert gf(7) ** gf(11) == 1
 
 
 def test_sqrt():
