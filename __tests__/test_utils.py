@@ -1,9 +1,8 @@
 import pytest
-from src.utils import factors
+from hyperelliptic import factors
 
 
 def test_factorization():
-
     expected_209_factors = [11, 19]
     factors_209 = factors(209)
     assert all(f in expected_209_factors for f in factors_209)

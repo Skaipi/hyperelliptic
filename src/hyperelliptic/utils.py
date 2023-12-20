@@ -1,4 +1,4 @@
-from src.primes import PRIMES
+from .primes import PRIMES
 from random import randrange
 from math import gcd, log, floor
 

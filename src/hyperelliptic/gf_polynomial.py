@@ -1,5 +1,5 @@
-from src.ring_polynomial import RingPolynomial
-from src.polynomial import Polynomial
+from .ring_polynomial import RingPolynomial
+from .polynomial import Polynomial
 
 
 class GF_Polynomial(Polynomial):

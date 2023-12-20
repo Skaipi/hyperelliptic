@@ -1,6 +1,6 @@
 import math
 
-from src.utils import gf_operation
+from .utils import gf_operation
 
 
 class ZP:
