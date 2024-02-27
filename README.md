@@ -15,6 +15,15 @@ To install as python module:
 python -m pip install -e ./
 ```
 
+## Installation
+To install as python module:
+ - download this repo
+ - navigate to repo's directory
+ - run the following command to install from source
+```
+python -m pip install -e ./
+```
+
 ## Example
 ```python
 # Diffie-Hellman algorithm
