@@ -1,5 +1,5 @@
-from src.utils import factors
-from src.polynomial import Polynomial
+from .utils import factors
+from .polynomial import Polynomial
 
 
 class RingPolynomial(Polynomial):

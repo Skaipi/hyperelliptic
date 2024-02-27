@@ -1,5 +1,5 @@
-from src.integer import ZP
-from src.utils import gf_operation
+from .integer import ZP
+from .utils import gf_operation
 from random import randint
 
 

@@ -1,4 +1,4 @@
-from src.integer import ZP
+from .integer import ZP
 from copy import copy
 
 

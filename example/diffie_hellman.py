@@ -1,8 +1,4 @@
-import sys
-
-sys.path.insert(0, "..")
-
-from src.finite_field import FiniteField
+from hyperelliptic import FiniteField
 
 if __name__ == "__main__":
     SMALL_PRIME = 884666614024826252892955729547
@@ -15,10 +11,10 @@ if __name__ == "__main__":
     c = gf.hyperelliptic(h, f)
     g = c.get_random_divisor()
 
-    alice_number = gf.rand_int()
+    alice_number = gf.rand_element()
     alice_element = g * alice_number
 
-    bob_number = gf.rand_int()
+    bob_number = gf.rand_element()
     bob_element = g * bob_number
 
     alice_common_element = bob_element * alice_number

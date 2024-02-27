@@ -1,5 +1,5 @@
-from src.ring_polynomial import RingPolynomial
-from src.polynomial import Polynomial
+from .ring_polynomial import RingPolynomial
+from .polynomial import Polynomial
 
 
 class GF_Polynomial(Polynomial):
@@ -26,6 +26,10 @@ class GF_Polynomial(Polynomial):
         return a
 
     def sqrt(self):
+        # Handle special case of char(2) fields
+        if self.gf.p == 2:
+            return pow(self, self.gf.q // 2)
+
         # Tonelli-Shanks algorithm
         if not self.is_quadratic_residue():
             raise ValueError(f"Argument {self} has no square root")

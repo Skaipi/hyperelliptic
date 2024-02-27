@@ -1,4 +1,4 @@
-from src.finite_field import FiniteField
+from hyperelliptic import FiniteField
 
 
 def test_constructor():

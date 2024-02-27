@@ -1,7 +1,7 @@
-from src.ring_polynomial import RingPolynomial
-from src.gf_polynomial import GF_Polynomial
-from src.hyperelliptic import HC
-from src.integer import ZP
+from .ring_polynomial import RingPolynomial
+from .gf_polynomial import GF_Polynomial
+from .hyperelliptic import HC
+from .integer import ZP
 
 
 class GaloisField:

@@ -1,4 +1,4 @@
-from src.polynomial import Polynomial
+from hyperelliptic import Polynomial
 
 
 def test_constructors():
