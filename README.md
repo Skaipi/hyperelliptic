@@ -6,6 +6,15 @@
 
 Set of tools for operations on hyperelliptic curves and finite fields.
 
+## Installation
+To install as python module:
+ - download this repo
+ - navigate to repo's directory
+ - run the following command to install from source
+```
+python -m pip install -e ./
+```
+
 ## Example
 ```python
 # Diffie-Hellman algorithm
@@ -13,7 +22,7 @@ gf = GaloisField(PRIME_NUMBER)
 h = gf.poly([0])
 f = gf.poly(COEFFICIENTS)
 c = gf.hyperelliptic(h, f)
-g = c.divisor_from_points([p1, p2])
+g = c.get_random_divisor()
 
 alice_secret = gf.rand_int()
 alice_element = g * alice_secret
