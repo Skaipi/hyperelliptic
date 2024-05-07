@@ -1,5 +1,5 @@
 import pytest
-from hyperelliptic import factors
+from hyperelliptic import factors, all_factors
 
 
 def test_factorization():
@@ -31,3 +31,20 @@ def test_factorization():
     too_big_to_factor = 728332861387732709516448268243094614312200863702341084222464
     with pytest.raises(ValueError):
         factors(too_big_to_factor)
+
+
+def test_all_factors():
+    expected_209_factors = [1, 11, 19, 209]
+    factors_209 = all_factors(209)
+    assert all(f in expected_209_factors for f in factors_209)
+    assert len(factors_209) == len(expected_209_factors)
+
+    expected_439_factors = [1, 439]
+    factors_439 = all_factors(439)
+    assert all(f in expected_439_factors for f in factors_439)
+    assert len(factors_439) == len(expected_439_factors)
+
+    expected_2401_factors = [1, 7, 49, 343, 2401]
+    factors_2401 = all_factors(2401)
+    assert all(f in expected_2401_factors for f in factors_2401)
+    assert len(factors_2401) == len(expected_2401_factors)

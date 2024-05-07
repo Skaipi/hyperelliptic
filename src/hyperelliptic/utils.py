@@ -1,6 +1,7 @@
 from .primes import PRIMES
 from random import randrange
 from math import gcd, log, floor
+from collections import Counter
 
 
 def gf_operation(function):
@@ -40,6 +41,16 @@ def is_prime(p, k=32):
         else:
             return False
     return True
+
+
+def all_factors(N):
+    result = set([1, N])
+    counter = Counter(factors(N))
+
+    for key, value in counter.items():
+        for exp in range(value):
+            result.add(key ** (exp + 1))
+    return result
 
 
 def factors(n):
