@@ -2,6 +2,8 @@ from .primes import PRIMES
 from random import randrange
 from math import gcd, log, floor
 from collections import Counter
+from itertools import combinations
+from functools import reduce
 
 
 def gf_operation(function):
@@ -45,11 +47,12 @@ def is_prime(p, k=32):
 
 def all_factors(N):
     result = set([1, N])
-    counter = Counter(factors(N))
+    divisors = factors(N)
 
-    for key, value in counter.items():
-        for exp in range(value):
-            result.add(key ** (exp + 1))
+    for i in range(1, len(divisors) + 1):
+        for c in combinations(divisors, i):
+            result.add(reduce((lambda x, y: x * y), c))
+
     return result
 
 
