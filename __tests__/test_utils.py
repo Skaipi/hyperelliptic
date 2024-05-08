@@ -34,6 +34,16 @@ def test_factorization():
 
 
 def test_all_factors():
+    expected_12_factors = [1, 2, 3, 4, 6, 12]
+    factors_12 = all_factors(12)
+    assert all(f in expected_12_factors for f in factors_12)
+    assert len(factors_12) == len(expected_12_factors)
+
+    expected_216_factors = [1, 2, 3, 4, 6, 8, 9, 12, 18, 24, 27, 36, 54, 72, 108, 216]
+    factors_216 = all_factors(216)
+    assert all(f in expected_216_factors for f in factors_216)
+    assert len(factors_216) == len(expected_216_factors)
+
     expected_209_factors = [1, 11, 19, 209]
     factors_209 = all_factors(209)
     assert all(f in expected_209_factors for f in factors_209)
