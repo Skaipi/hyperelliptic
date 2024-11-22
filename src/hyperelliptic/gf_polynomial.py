@@ -1,4 +1,3 @@
-from .ring_polynomial import RingPolynomial
 from .polynomial import Polynomial
 
 

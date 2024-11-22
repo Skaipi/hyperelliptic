@@ -45,7 +45,7 @@ class GaloisField:
             yield result
             result = result * a
 
-    def poly(self, coeff: list[ZP | int]) -> RingPolynomial:
+    def poly(self, coeff: list[ZP] | list[int]) -> RingPolynomial:
         """Returns polynomial over Galois Field. A polynomial whose coefficients are GF elements."""
         parsed_coeff = self._parse_coeff(coeff)
         return RingPolynomial(self, parsed_coeff)
@@ -54,14 +54,14 @@ class GaloisField:
         """Returns random element from Galois Field"""
         return self.element([self.base.rand_element() for _ in range(self.m)])
 
-    def hyperelliptic(self, h, f) -> HC:
+    def hyperelliptic(self, h: RingPolynomial, f: RingPolynomial) -> HC:
         """Returns hyperelliptic curve defined over Galois Field"""
         return HC(self, h, f)
 
     def _is_field_element(self, value: object) -> bool:
         return isinstance(value, GF_Polynomial) and value.gf == self
 
-    def _parse_coeff(self, coeff: list[ZP | int]) -> list[GF_Polynomial]:
+    def _parse_coeff(self, coeff: list[ZP] | list[int]) -> list[GF_Polynomial]:
         return list(map(self.element, coeff))
 
     def __call__(self, value) -> GF_Polynomial:
