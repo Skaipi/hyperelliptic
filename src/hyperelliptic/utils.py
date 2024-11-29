@@ -1,14 +1,17 @@
-from .primes import PRIMES
+"""(module) with set of various tools used in hyperelliptic packet"""
+
 from random import randrange
 from math import gcd, log, floor
 from itertools import combinations
 from functools import reduce
+from .primes import PRIMES
 
 
 def gf_operation(function):
     """Decorator checking if a method taking elements of finite fields are defined over the same field"""
 
     def function_wrapper(a, b):
+        # pylint: disable=C0123
         is_field_operation = type(a) == type(b)
         if is_field_operation and a.gf != b.gf:
             raise ValueError(f"{a} field does not match {b} field")
