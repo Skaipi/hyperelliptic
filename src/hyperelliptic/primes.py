@@ -1,3 +1,5 @@
+"""List of all primes less than 1000"""
+
 PRIMES = [
     2,
     3,
