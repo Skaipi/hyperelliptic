@@ -2,8 +2,10 @@
 
 from random import randrange
 from math import gcd, log, floor
+from collections import Counter
 from itertools import combinations
 from functools import reduce
+
 from .primes import PRIMES
 
 
