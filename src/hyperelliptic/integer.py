@@ -1,26 +1,34 @@
+"""(module) containing ZP class"""
+
 import math
 
 from .utils import gf_operation
 
 
 class ZP:
+    """Class representing integers over finite field"""
+
     def __init__(self, gf, value):
         self.gf = gf
         self.p = gf.p
         self.value = value % self.p
 
     def zero(self):
+        """Neutral element of addition"""
         return self._from_value(0)
 
     def one(self):
+        """Neutral element of multiplication"""
         return self._from_value(1)
 
     @gf_operation
     def gcd(self, other):
+        """Euclidean algorithm"""
         return math.gcd(self.value, other.value)
 
     @gf_operation
     def xgcd(self, other):
+        """Extended Euclidean algorithm"""
         r0 = other.value if isinstance(other, ZP) else other
         r1 = self.value
         s1, s0 = 1, 0
@@ -35,7 +43,7 @@ class ZP:
         return self._from_value(r1), self._from_value(s1), self._from_value(t1)
 
     def sqrt(self):
-        # Tonelli-Shanks algorithm
+        """Tonelli-Shanks algorithm"""
         if not self.is_quadratic_residue():
             raise ValueError(f"Argument {self} has no square root")
 
@@ -78,20 +86,23 @@ class ZP:
         return r
 
     def is_quadratic_residue(self):
+        """Returns true if square root of element exists"""
         if self.legendre() == self.one() or self == self.zero():
             return True
         return False
 
     def legendre(self):
+        """Legendre symbol of an element"""
         return pow(self, ((self.p - 1) // 2))
 
     def inverse(self):
+        """Find inverse y of an element x such that x^{-1} = y and xy = 1"""
         if self == 0:
-            raise ZeroDivisionError(f"Element 0 is not inversable")
+            raise ZeroDivisionError("Element 0 is not inversable")
 
         r, s, t = self.xgcd(self.p)
         if r > 1:
-            raise Exception(f"Element {self.value} is not inversable mod {self.p}")
+            raise TypeError(f"Element {self.value} is not inversable mod {self.p}")
         return s
 
     def _from_value(self, value):

@@ -1,13 +1,19 @@
-from .primes import PRIMES
+"""(module) with set of various tools used in hyperelliptic packet"""
+
 from random import randrange
 from math import gcd, log, floor
 from collections import Counter
 from itertools import combinations
 from functools import reduce
 
+from .primes import PRIMES
+
 
 def gf_operation(function):
+    """Decorator checking if a method taking elements of finite fields are defined over the same field"""
+
     def function_wrapper(a, b):
+        # pylint: disable=C0123
         is_field_operation = type(a) == type(b)
         if is_field_operation and a.gf != b.gf:
             raise ValueError(f"{a} field does not match {b} field")
@@ -17,7 +23,7 @@ def gf_operation(function):
 
 
 def is_prime(p, k=32):
-    # Miller-Rabin primality test
+    """Miller-Rabin primality test"""
     if p < 2:
         return False
     if p == 2:
@@ -46,6 +52,7 @@ def is_prime(p, k=32):
 
 
 def all_factors(N):
+    """Returns set of all factors of N."""
     result = set([1, N])
     divisors = factors(N)
 
@@ -57,6 +64,7 @@ def all_factors(N):
 
 
 def factors(n):
+    """Returns factors of an integer provided as an argument"""
     factors = []
 
     while n > 1:
@@ -68,7 +76,7 @@ def factors(n):
 
 
 def factor(n, smoothness_bound=1):
-    # Factor small numbers with pollard's p - 1
+    """Factor small numbers with pollard's p - 1"""
     if is_prime(n):
         return n
 

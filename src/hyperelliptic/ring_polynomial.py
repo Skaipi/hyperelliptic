@@ -1,8 +1,12 @@
-from .utils import factors
+"""(module) containing implementation of polynomial ring over arbitrary finite field"""
+
+from .utils import factors as int_factors
 from .polynomial import Polynomial
 
 
 class RingPolynomial(Polynomial):
+    """RingPolynomial implements polynomials with coefficients from finite field"""
+
     def __init__(self, field, coeff, symbol="x"):
         self.gf = field
         super().__init__(coeff, symbol)
@@ -13,8 +17,11 @@ class RingPolynomial(Polynomial):
     def coeff_one(self):
         return self.gf.one()
 
-    # https://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
     def factors(self):
+        """
+        Returns factors of polynomial. Returns list of poolynomials that divide this element.
+        https://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
+        """
         factors = []
         sf_factors = self.square_free_factors()
 
@@ -27,7 +34,11 @@ class RingPolynomial(Polynomial):
 
         return factors
 
+    def gcd(self, other) -> "RingPolynomial":
+        return self._from_coeff(super().gcd(other).coeff)
+
     def square_free_factors(self):
+        """Yun's algorithm"""
         gf = self.gf
         factors = []
 
@@ -53,6 +64,7 @@ class RingPolynomial(Polynomial):
         return factors
 
     def distinct_degree_factors(self):
+        """Split a square-free polynomial into a product of polynomials whose irreducible factors all have the same degree."""
         gf = self.gf
         factors = []
         poly = self._from_coeff(self.coeff)
@@ -73,7 +85,7 @@ class RingPolynomial(Polynomial):
         return factors
 
     def equal_degree_factors(self, deg):
-        # Cantor–Zassenhaus algorithm
+        """Cantor–Zassenhaus algorithm"""
         gf = self.gf
         factors = [self._from_coeff(self.coeff)]
 
@@ -88,6 +100,7 @@ class RingPolynomial(Polynomial):
                     continue
                 d = g.gcd(fac)
                 if d not in [self.one(), fac]:
+                    # pylint: disable=W4701
                     factors.remove(fac)
                     factors.append(d)
                     factors.append(fac // d)
@@ -95,9 +108,9 @@ class RingPolynomial(Polynomial):
         return factors
 
     def is_irreducible(self):
-        # Rabin test of irreducibility
+        """Rabin test of irreducibility"""
         gf = self.gf
-        deg_factors = factors(self.deg)
+        deg_factors = int_factors(self.deg)
         quotients = set([self.deg // factor for factor in deg_factors])
         x = self._from_coeff([self.coeff_one(), self.coeff_zero()])
 
@@ -118,3 +131,6 @@ class RingPolynomial(Polynomial):
 
     def _from_coeff(self, coeff):
         return RingPolynomial(self.gf, coeff, self.symbol)
+
+    def __floordiv__(self, other) -> "RingPolynomial":
+        return self._from_coeff(super().__floordiv__(other).coeff)

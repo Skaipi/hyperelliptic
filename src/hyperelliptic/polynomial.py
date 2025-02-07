@@ -1,17 +1,24 @@
-from .integer import ZP
+"""(module) containing general implementation of polynomial with coeffiecients from finite field"""
+
 from copy import copy
+from .integer import ZP
 
 
 def is_int_like(obj):
+    """Check if argument is integer like"""
     return isinstance(obj, int) or isinstance(obj, ZP)
 
 
 def is_number_like(obj):
+    """Check if argument is numeric type"""
     return is_int_like(obj) or isinstance(obj, float)
 
 
 def same_type_coeff(function):
+    """Decorator that ensures arguments for polynomial method have coefficients with the same type"""
+
     def wrapper(poly_a, poly_b):
+        # pylint: disable=C0123
         if is_number_like(poly_a) or is_number_like(poly_b):
             return function(poly_a, poly_b)
 
@@ -27,6 +34,8 @@ def same_type_coeff(function):
 
 
 class Polynomial:
+    """General use class implementing basic operations on arbitrary polynomials"""
+
     def __init__(self, coeff, symbol="x"):
         self.coeff = self._strip(coeff)
         self.symbol = symbol
@@ -34,46 +43,57 @@ class Polynomial:
 
     @property
     def deg(self):
+        """Polynomial degree"""
         return len(self.coeff) - 1
 
     @property
     def leading_coeff(self):
+        """Most signifficant coefficient of a polynomial"""
         return self.coeff[0]
 
     def zero(self):
+        """Polynomial neutral for addition"""
         return self._from_coeff([self.coeff_zero()])
 
     def one(self):
+        """Polynomial neutral to multiplication"""
         return self._from_coeff([self.coeff_one()])
 
     def coeff_zero(self):
+        """Coefficient neutral to addition"""
         return 0
 
     def coeff_one(self):
+        """Coefficient neutral to multiplication"""
         return 1
 
     def to_monic(self):
+        """Reduce polynomial to form where leading coefficient is equal to one"""
         c = self.leading_coeff
         if c != 1:
             return self / c
         return self
 
-    def isConst(self):
+    def is_const(self):
+        """Check if polynial is degree 0"""
         return self.deg <= 0
 
-    def toInt(self):
-        if not self.isConst():
-            raise Exception(f"Can not cast {self} to integer")
+    def to_int(self):
+        """Cast degree 0 polynomial to base element"""
+        if not self.is_const():
+            raise TypeError(f"Can not cast non-0 degree poly {self} to an integer")
         return self.leading_coeff
 
     def derivative(self):
+        """Derivative of polynomial"""
         if self.deg == 0:
             return self.zero()
         coeff = [c * (self.deg - i) for i, c in enumerate(self.coeff[:-1])]
         return self._from_coeff(coeff)
 
     @same_type_coeff
-    def gcd(self, other):
+    def gcd(self, other) -> "Polynomial":
+        """Euclidean algorithm for polynomials"""
         r1, r0 = self, other
         while r0 != self.zero():
             r1, r0 = r0, r1 % r0
@@ -81,7 +101,9 @@ class Polynomial:
         return r1.to_monic()
 
     @same_type_coeff
-    def xgcd(self, other):
+    def xgcd(self, other: "Polynomial"):
+        """Extended Euclidean algorithm for polynomials"""
+        # pylint: disable=W0212
         r1, r0 = self._copy(), other._copy()
         s1, s0 = self.one(), self.zero()
         t1, t0 = self.zero(), self.one()
@@ -106,7 +128,7 @@ class Polynomial:
     def _from_coeff(self, coeff):
         return Polynomial(coeff, self.symbol)
 
-    def _strip(self, coeff):
+    def _strip(self, coeff) -> list[int | ZP]:
         element = next(filter(lambda x: x != 0, coeff), None)
         return [self.coeff_zero()] if element is None else coeff[coeff.index(element) :]
 
@@ -162,8 +184,8 @@ class Polynomial:
     def __divmod__(self, other):
         if self.deg < other.deg:
             return self.zero(), self
-        if other.isConst():
-            return self / other.toInt(), self.zero()
+        if other.is_const():
+            return self / other.to_int(), self.zero()
 
         zero = self.coeff_zero()
         one = self.coeff_one()
@@ -188,7 +210,7 @@ class Polynomial:
 
     def __pow__(self, other, mod=None):
         if not is_int_like(other):
-            raise NotImplementedError(f"Polynomial exp error (exp = {exp})")
+            raise NotImplementedError(f"Polynomial exp error (exp = {other})")
 
         sq = self
         exp = other if isinstance(other, int) else other.value
@@ -197,10 +219,10 @@ class Polynomial:
         while exp > 0:
             if exp % 2 == 1:
                 result = result * sq
-                if mod != None:
+                if mod is not None:
                     result = result % mod
             sq *= sq
-            if mod != None:
+            if mod is not None:
                 sq = sq % mod
             exp = exp // 2
         return result
@@ -239,6 +261,7 @@ class Polynomial:
                 return f"{wrap_expr(c)}{self.symbol}{append_pow(n)}"
             return f"{self.symbol}{append_pow(n)}"
 
+        # pylint: disable=C3001
         result = ""
         first = 0
         last = self.deg
