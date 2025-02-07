@@ -1,3 +1,5 @@
+"""(module) containing finite field class with access to various structures defined over such field"""
+
 from random import randint
 
 from .utils import is_prime

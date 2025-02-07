@@ -1,12 +1,16 @@
+"""(module) containing HC [hyperelliptic curve] class"""
+
+from random import randint
 from .integer import ZP
 from .utils import gf_operation
-from random import randint
 
 
 INF_POINT = ("Inf", "Inf")
 
 
 class HC:
+    """Class implementing hyperelliptic curve"""
+
     def __init__(self, gf, h, f):
         self.g = f.deg // 2
         self.gf = gf
@@ -26,15 +30,19 @@ class HC:
         # Check if C is smooth
 
     def divisor(self, a, b):
+        """Get divisor (element of a group defined by the curve) defined by polynomials a and b provided in arguments"""
         return Divisor(self, a, b)
 
     def zero_divisor(self):
+        """Get divisor which is also neutral element of a group defined by the curve"""
         return Divisor.zero(self)
 
     def divisor_from_points(self, points):
+        """Get divisor determined by points provided in argument"""
         return Divisor.from_points(self, points)
 
     def get_random_divisor(self):
+        """Get random element of a group defined by the curve"""
         points = []
         for i in range(self.g):
             p = self.get_random_point()
@@ -44,16 +52,19 @@ class HC:
         return Divisor.from_points(self, points)
 
     def get_random_point(self):
+        """Get random point lying on a curve"""
         point = None
-        while point == None:
+        while point is None:
             x = randint(0, self.gf.p)
             point = self._point_from_x(x) if x != self.gf.p else INF_POINT
         return point
 
     def infinity_point(self):
+        """Point at infinity"""
         return INF_POINT
 
     def point_inverse(self, point):
+        """Get inverse of a given point lying on a curve"""
         if point == INF_POINT:
             return point
         x, y = point[0], point[1]
@@ -78,6 +89,7 @@ class HC:
         return (x, y)
 
     def get_all_points(self):
+        """Get all points lying on a curve"""
         result = [INF_POINT]
         for x in self.gf.get_elements():
             point = self._point_from_x(x)
@@ -95,6 +107,8 @@ class HC:
 
 
 class Divisor:
+    """Class implementing elements of group defined over hyperelliptic curve"""
+
     def __init__(self, curve, poly_u, poly_v):
         # Mumford representation as pair of polynomials a, b
         # a | b^2 + bh - f && deg(b) < deg(a) <= genus
@@ -105,6 +119,8 @@ class Divisor:
 
     @staticmethod
     def from_points(curve, points):
+        """Get divisor in mumford representation from point representation"""
+        # pylint: disable=W0212
         # Find first polynomial of Mumford representation
         valid_points = list(filter(lambda p: p != INF_POINT, points))
         gf = curve.gf
@@ -117,6 +133,7 @@ class Divisor:
         p_y = curve._y_from_points(valid_unique_points)
 
         # Find second polynomial via Lagrange interpolation
+        # pylint: disable=C0200
         v = gf.poly([gf.zero()])
         for i in range(len(p_y)):
             tmp = gf.poly([gf.one()])
@@ -130,13 +147,18 @@ class Divisor:
 
     @classmethod
     def zero(cls, curve):
+        """Divisor neutral for addition"""
         return Divisor(
             curve, curve.gf.poly([curve.gf.one()]), curve.gf.poly([curve.gf.zero()])
         )
 
     @property
     def points(self):
+        """Compute point representation of divisor. This might require factorization of polynomials describing mumford representation and therefore be computationally expensive"""
+        # pylint: disable=W0201
+        # Apply memoization of _points property and avoid recomputation of factors
         if hasattr(self, "_points"):
+            # pylint: disable=E0203
             return self._points
 
         c, u, v = self.c, self.u, self.v
@@ -152,6 +174,7 @@ class Divisor:
         return valid_points
 
     def to_reduced(self):
+        """Algorithm taking a divisor into its reduced form"""
         u, v, f, h, g = self.u, self.v, self.c.f, self.c.h, self.c.g
 
         _u = (f - v * h - v * v) // u

@@ -2,6 +2,8 @@ from .polynomial import Polynomial
 
 
 class GF_Polynomial(Polynomial):
+    """GF_Polynomial class represents elements of galois field"""
+
     def __init__(self, field, coeff, symbol="a"):
         self.gf = field
         super().__init__(coeff, symbol)
@@ -16,15 +18,17 @@ class GF_Polynomial(Polynomial):
         return self.gf.base.one()
 
     def inverse(self):
+        """Find inverse y of an element x such that x^{-1} = y and xy = 1"""
         if self == self.zero():
             raise ZeroDivisionError("Element 0 has no inverse")
 
         d, a, b = self.xgcd(self.gf._poly)
-        if not d.isConst():
-            raise Exception("Element has no inverse!")
+        if not d.is_const():
+            raise TypeError("Element has no inverse!")
         return a
 
     def sqrt(self):
+        """Find square root y of element x such that y^{2} = x"""
         # Handle special case of char(2) fields
         if self.gf.p == 2:
             return pow(self, self.gf.q // 2)
@@ -72,9 +76,11 @@ class GF_Polynomial(Polynomial):
         return r
 
     def is_quadratic_residue(self):
+        """Returns true if square root of element exists"""
         return self.legendre() == self.one() or self == self.zero()
 
     def legendre(self):
+        """Legendre symbol of an element"""
         return pow(self, ((self.gf.q - 1) // 2))
 
     def _from_coeff(self, coeff):

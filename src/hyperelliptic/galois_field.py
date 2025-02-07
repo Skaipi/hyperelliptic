@@ -1,7 +1,14 @@
+"""(module) containing extension of finite field"""
+
+from typing import TYPE_CHECKING
+
 from .ring_polynomial import RingPolynomial
 from .gf_polynomial import GF_Polynomial
 from .hyperelliptic import HC
 from .integer import ZP
+
+if TYPE_CHECKING:
+    from .finite_field import FiniteField
 
 
 class GaloisField:
@@ -14,7 +21,7 @@ class GaloisField:
             raise ValueError(f"{polynomial} is not irreducible")
 
         self._poly: RingPolynomial = polynomial
-        self.base: "FiniteField" = base
+        self.base: FiniteField = base
         self.p: int = base.p
         self.m: int = polynomial.deg
         self.q: int = self.p**self.m
