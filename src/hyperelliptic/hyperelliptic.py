@@ -3,7 +3,7 @@
 from random import randint
 from .integer import ZP
 from .utils import gf_operation
-
+from .polynomial import Polynomial
 
 INF_POINT = ("Inf", "Inf")
 
@@ -26,25 +26,23 @@ class HC:
         if gf.p != 2 and h != 0:
             raise ValueError("h(x) must be 0 for char(F) != 2")
 
-        # TODO:
-        # Check if C is smooth
-
-    def divisor(self, a, b):
-        """Get divisor (element of a group defined by the curve) defined by polynomials a and b provided in arguments"""
+    def divisor(self, a: Polynomial, b: Polynomial):
+        """Get divisor (element of a group defined by the curve)
+        defined by polynomials a and b provided in arguments"""
         return Divisor(self, a, b)
 
     def zero_divisor(self):
         """Get divisor which is also neutral element of a group defined by the curve"""
         return Divisor.zero(self)
 
-    def divisor_from_points(self, points):
+    def divisor_from_points(self, points: list[tuple[int, int]]):
         """Get divisor determined by points provided in argument"""
         return Divisor.from_points(self, points)
 
     def get_random_divisor(self):
         """Get random element of a group defined by the curve"""
         points = []
-        for i in range(self.g):
+        for _ in range(self.g):
             p = self.get_random_point()
             while self.point_inverse(p) in points:
                 p = self.get_random_point()
@@ -63,20 +61,20 @@ class HC:
         """Point at infinity"""
         return INF_POINT
 
-    def point_inverse(self, point):
+    def point_inverse(self, point: tuple[int, int]):
         """Get inverse of a given point lying on a curve"""
         if point == INF_POINT:
             return point
         x, y = point[0], point[1]
         return (x, -y - self.h(x))
 
-    def _x_from_points(self, points):
+    def _x_from_points(self, points: list[tuple[int, int]]):
         return list(map(lambda p: p[0], points))
 
-    def _y_from_points(self, points):
+    def _y_from_points(self, points: list[tuple[int, int]]):
         return list(map(lambda p: p[1], points))
 
-    def _point_from_x(self, x):
+    def _point_from_x(self, x: tuple[int, int]):
         # NOTE: This formula works only for fields of characteristic != 2
         hx = self.h(x)
         fx = self.f(x)
@@ -93,7 +91,7 @@ class HC:
         result = [INF_POINT]
         for x in self.gf.get_elements():
             point = self._point_from_x(x)
-            if point == None:
+            if point is None:
                 continue
 
             inverse = self.point_inverse(point)
@@ -109,7 +107,7 @@ class HC:
 class Divisor:
     """Class implementing elements of group defined over hyperelliptic curve"""
 
-    def __init__(self, curve, poly_u, poly_v):
+    def __init__(self, curve: HC, poly_u: Polynomial, poly_v: Polynomial):
         # Mumford representation as pair of polynomials a, b
         # a | b^2 + bh - f && deg(b) < deg(a) <= genus
         self.c = curve
@@ -118,7 +116,7 @@ class Divisor:
         self.v = poly_v
 
     @staticmethod
-    def from_points(curve, points):
+    def from_points(curve: HC, points: list[tuple[int, int]]):
         """Get divisor in mumford representation from point representation"""
         # pylint: disable=W0212
         # Find first polynomial of Mumford representation
@@ -146,7 +144,7 @@ class Divisor:
         return Divisor(curve, u, v)
 
     @classmethod
-    def zero(cls, curve):
+    def zero(cls, curve: HC):
         """Divisor neutral for addition"""
         return Divisor(
             curve, curve.gf.poly([curve.gf.one()]), curve.gf.poly([curve.gf.zero()])
@@ -154,7 +152,10 @@ class Divisor:
 
     @property
     def points(self):
-        """Compute point representation of divisor. This might require factorization of polynomials describing mumford representation and therefore be computationally expensive"""
+        """Compute point representation of divisor.
+        This might require factorization of polynomials
+        describing mumford representation and therefore be computationally expensive
+        """
         # pylint: disable=W0201
         # Apply memoization of _points property and avoid recomputation of factors
         if hasattr(self, "_points"):
@@ -188,7 +189,7 @@ class Divisor:
         return Divisor(self.c, _u, _v)
 
     @gf_operation
-    def __add__(self, other):
+    def __add__(self, other: "Divisor"):
         if self == Divisor.zero(self.c):
             return other
         if other == Divisor.zero(self.c):
@@ -205,7 +206,7 @@ class Divisor:
 
         return Divisor(self.c, u, v).to_reduced()
 
-    def __mul__(self, other):
+    def __mul__(self, other: "Divisor"):
         if not isinstance(other, int) and not isinstance(other, ZP):
             raise ValueError(f"Divisor cannot be multiplied by {other}")
 
@@ -224,7 +225,7 @@ class Divisor:
         b = -self.v - self.c.h
         return Divisor(self.c, self.u, b)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
         if isinstance(other, Divisor):
             return self.u == other.u and self.v == other.v
         return False

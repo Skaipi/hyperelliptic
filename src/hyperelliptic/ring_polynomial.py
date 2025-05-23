@@ -34,10 +34,10 @@ class RingPolynomial(Polynomial):
 
         return factors
 
-    def gcd(self, other) -> "RingPolynomial":
+    def gcd(self, other: "RingPolynomial") -> "RingPolynomial":
         return self._from_coeff(super().gcd(other).coeff)
 
-    def square_free_factors(self):
+    def square_free_factors(self) -> list["RingPolynomial"]:
         """Yun's algorithm"""
         gf = self.gf
         factors = []
@@ -51,7 +51,8 @@ class RingPolynomial(Polynomial):
             y = w.gcd(c)
             fac = w // y
             if fac != self.one() and i % gf.p != 0:
-                [factors.append(fac) for _ in range(i)]
+                for _ in range(i):
+                    factors.append(fac)
             w = y
             c = c // y
             i = i + 1
@@ -63,8 +64,9 @@ class RingPolynomial(Polynomial):
 
         return factors
 
-    def distinct_degree_factors(self):
-        """Split a square-free polynomial into a product of polynomials whose irreducible factors all have the same degree."""
+    def distinct_degree_factors(self) -> list[tuple["RingPolynomial", int]]:
+        """Split a square-free polynomial into a product of polynomials
+        whose irreducible factors all have the same degree."""
         gf = self.gf
         factors = []
         poly = self._from_coeff(self.coeff)
@@ -84,8 +86,8 @@ class RingPolynomial(Polynomial):
             factors.append((poly, poly.deg))
         return factors
 
-    def equal_degree_factors(self, deg):
-        """Cantor–Zassenhaus algorithm"""
+    def equal_degree_factors(self, deg) -> list["RingPolynomial"]:
+        """Cantor Zassenhaus algorithm"""
         gf = self.gf
         factors = [self._from_coeff(self.coeff)]
 

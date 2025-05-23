@@ -100,7 +100,7 @@ class ZP:
         if self == 0:
             raise ZeroDivisionError("Element 0 is not inversable")
 
-        r, s, t = self.xgcd(self.p)
+        r, s, _ = self.xgcd(self.p)
         if r > 1:
             raise TypeError(f"Element {self.value} is not inversable mod {self.p}")
         return s

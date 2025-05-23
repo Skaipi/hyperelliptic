@@ -1,3 +1,5 @@
+"""(module) containing implementation of polynomial as an element of Galois Field"""
+
 from .polynomial import Polynomial
 
 

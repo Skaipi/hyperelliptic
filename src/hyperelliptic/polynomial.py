@@ -1,5 +1,7 @@
 """(module) containing general implementation of polynomial with coeffiecients from finite field"""
 
+from __future__ import annotations
+
 from copy import copy
 from .integer import ZP
 
@@ -133,12 +135,16 @@ class Polynomial:
         return [self.coeff_zero()] if element is None else coeff[coeff.index(element) :]
 
     @same_type_coeff
-    def __add__(self, other):
+    def __add__(self, other: "Polynomial" | int | ZP) -> "Polynomial":
         if isinstance(other, ZP) or isinstance(other, int):
             coeff = copy(self.coeff)  # Preventing mutation on self.coeff
             coeff[-1] = coeff[-1] + other
             return self._from_coeff(coeff)
+        if isinstance(other, Polynomial):
+            return self.__add_poly(other)
+        raise TypeError("Invalid argument for polynomial addition")
 
+    def __add_poly(self, other: "Polynomial") -> "Polynomial":
         zero_coeff = self.coeff_zero()
         size = max(self.deg, other.deg)
         s_coeff = [zero_coeff] * (size - self.deg) + self.coeff
@@ -160,10 +166,14 @@ class Polynomial:
         return -self + other
 
     @same_type_coeff
-    def __mul__(self, other):
+    def __mul__(self, other: "Polynomial" | int | ZP) -> "Polynomial":
         if is_number_like(other):
             return self._from_coeff(list(map(lambda x: x * other, self.coeff)))
+        if isinstance(other, Polynomial):
+            return self.__mul_poly(other)
+        raise TypeError("Invalid argument for polynomial multiplication")
 
+    def __mul_poly(self, other: "Polynomial") -> "Polynomial":
         result = [self.coeff_zero()] * (self.deg + other.deg + 1)
         for e1, c1 in enumerate(self.coeff):
             for e2, c2 in enumerate(other.coeff):

@@ -2,7 +2,6 @@
 
 from random import randrange
 from math import gcd, log, floor
-from collections import Counter
 from itertools import combinations
 from functools import reduce
 
@@ -10,7 +9,8 @@ from .primes import PRIMES
 
 
 def gf_operation(function):
-    """Decorator checking if a method taking elements of finite fields are defined over the same field"""
+    """Decorator checking if a method taking elements
+    of finite fields are defined over the same field"""
 
     def function_wrapper(a, b):
         # pylint: disable=C0123
@@ -65,14 +65,14 @@ def all_factors(N):
 
 def factors(n):
     """Returns factors of an integer provided as an argument"""
-    factors = []
+    computed_factors = []
 
     while n > 1:
         x = factor(n)
-        factors.append(x)
+        computed_factors.append(x)
         n = n // x
 
-    return factors
+    return computed_factors
 
 
 def factor(n, smoothness_bound=1):
